@@ -4,6 +4,7 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var mongoose = require('./src/db');
 var cors = require('cors');
+var blindSignature = require('blind-signatures');
 require('dotenv').config();
 
 var adminRouter = require('./src/routes/admin');
@@ -49,5 +50,7 @@ app.use('/admin',adminRouter);
 
 
 app.listen(port,() =>{
+	new_key = blindSignature.keyGeneration({b:2048});
+	console.log(typeof(new_key),new_key);
 	console.log('server is up on ' + port);
 })

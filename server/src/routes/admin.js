@@ -73,10 +73,13 @@ router.post('/signin',(req,res) =>{
     var username = req.body.username;
     var password = req.body.password;
     User.findOne({username:username},function(err,user){
+        console.log('itshere');
         if(err){
+            console.log(err);
             res.status(500).json({error:err});
         }
         if(!user){
+            console.log(user);
             res.json({success:false,
                       message:"Signin failed. account does not exist",
                       token:''

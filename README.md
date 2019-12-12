@@ -9,3 +9,5 @@ Process Flow
 8. Then, the voters can send their m and s(m) to the DistrictBallot contract.
 9. The DistrictBallot contract will verify m and s(m) using the public key (n,e) and count it as a valid vote to the state variable.
 10. By the deadline of the ballot, CA will calculate all votes form different district and 
+
+To start, Run npm start for both app and server

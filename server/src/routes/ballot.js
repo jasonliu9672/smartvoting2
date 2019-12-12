@@ -4,7 +4,7 @@ var router = express.Router();
 var blindSignature = require('blind-signatures');
 var {check, validationResult } = require('express-validator');
 
-router.post('/ballot/create', [
+router.post('/create-ballot', [
     check('starttime').isAfter().withMessage('chosen date is not a valid date'),
     check('endtime').isAfter().withMessage('chosen date is not a valid date')
 ],(req,res) =>{
@@ -25,12 +25,13 @@ router.post('/ballot/create', [
             districts: districts,
             starttime: starttime,
             endtime: endtime,
-            key: {
-                N: new_key.keyPair.n.toString(),
-                E: new_key.keyPair.e.tostring()
-            }
+            key: new_key
         })
         res.json({success:true,
             message:"Ballot is created."});
     }
+})
+router.get('/get-ballots/ballots:page',(req,res) =>{
+    const resPerPage = 9; // results per page
+    const page = req.params.page || 1;
 })

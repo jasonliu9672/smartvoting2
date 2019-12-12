@@ -1,7 +1,7 @@
 {
-  "name": "ecommerce",
+  "name": "smartvoting",
   "version": "1.0.0",
-  "description": "shoping website",
+  "description": "a voting app based on blockchain",
   "author": "Jason Liu",
   "private": true,
   "scripts": {

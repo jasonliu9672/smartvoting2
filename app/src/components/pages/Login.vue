@@ -47,7 +47,7 @@
             </div>
              <div class="mb-3">
               <input type="password" id="signupPassword"  class="form-control validate" v-model="newuser.password">
-              <label data-error="wrong" data-success="right" for="signupPassword">Your password</label>
+              <label data-error="wrong" data-success="right" for="signupPassword">Your password (enter password longer than 7 characters)</label>
             </div>
           </div>
           <div class="modal-footer">

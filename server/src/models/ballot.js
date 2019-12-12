@@ -24,8 +24,8 @@ const BallotSchema  = mongoose.Schema({
         required: true
     },
     key:{
-        type: Map,
-        of: String
+        type: Object,
+        required: true
     }
 })
 const Ballot = mongoose.model('Ballot', BallotSchema);

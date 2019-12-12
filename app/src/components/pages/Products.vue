@@ -2,16 +2,16 @@
     <div>
         <loading :active.sync="isLoading" ></loading>
         <div class="text-right">
-            <button class="btn btn-info" @click="openModal(true)">建立新的產品</button>
+            <button class="btn btn-info" @click="openModal(true)">Create New Ballot</button>
         </div>
         <table class="table mt-4">
             <thead>
-                <th width="120">分類</th>
-                <th>產品名稱</th>
-                <th width="100"> 原價</th>
-                <th width="120">售價</th>
-                <th width="120">是否啟用</th>
-                <th width="120">編輯</th>
+                <th width="150">title</th>
+                <th width="100">number of district</th>
+                <th width="100"> number of candidate</th>
+                <th width="100">start time</th>
+                <th width="100">end time</th>
+                <th width="150">key</th>
             </thead>
             <tbody>
                 <tr v-for="(item) in products" :key="item.id">
@@ -179,9 +179,9 @@ import $ from 'jquery';
 export default {
     data(){
         return{
-            products: [],
+            ballots: [],
             pagination: {},
-            tempProduct: {},
+            tempBallot: {},
             isNew: false,
             isLoading: false,
             status:{
@@ -190,7 +190,7 @@ export default {
         };
     },
     methods:{
-        getProducts(page = 1){
+        getBallots(page = 1){
             const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products?page=${page}`;
             const vm = this;
             vm.isLoading = true;

@@ -1,4 +1,6 @@
 const mongoose  = require('../db')
+const AutoIncrementFactory = require('mongoose-sequence');
+const AutoIncrement = AutoIncrementFactory(mongoose);
 const BallotSchema  = mongoose.Schema({
     title:{
         type: String,
@@ -11,7 +13,7 @@ const BallotSchema  = mongoose.Schema({
         trim: true,
     },
     districts:{
-        type: [Number],
+        type: Number,//change to Number array in the future
         required: true,
     },
     startTime:{
@@ -23,11 +25,16 @@ const BallotSchema  = mongoose.Schema({
         type: Date,
         required: true
     },
+    description:{
+        type: String,
+        required: false
+    },
     key:{
         type: Object,
         required: true
     }
 })
+BallotSchema.plugin(AutoIncrement,{inc_field:'id'});
 const Ballot = mongoose.model('Ballot', BallotSchema);
 
 module.exports = Ballot;

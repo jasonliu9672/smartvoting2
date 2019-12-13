@@ -14,6 +14,7 @@ router.post('/create-ballot', [
     var districts = req.body.districts;
     var starttime = req.body.starttime;
     var endtime = req.body.endtime;
+    var description = req.body.description;
     if(!errors.isEmpty()){
         return res.status(422).json({errors: errors.array()});
     }
@@ -25,13 +26,47 @@ router.post('/create-ballot', [
             districts: districts,
             starttime: starttime,
             endtime: endtime,
+            description: description,
             key: new_key
         })
         res.json({success:true,
             message:"Ballot is created."});
     }
 })
+router.put('/update-ballot/:id', (req,res) =>{
+    var target_id = req.params.id;
+    Ballot.findByIdAndUpdate({id:target_id})
+})
 router.get('/get-ballots/ballots:page',(req,res) =>{
-    const resPerPage = 9; // results per page
+    const size = 9; // results per page
     const page = req.params.page || 1;
+    var query = {};
+    var has_prev,has_next;
+    query.skip = size * (page-1);
+    query.limit = size;
+    Ballot.count({},function(err,totalCount){
+        if(err){
+            res.json({success:false,
+                    message:"Error fetching data"});
+        }
+        Ballot.find({},{},query,function(err,ballots){
+            if(err){
+                res.json({success:false,
+                        message:"Error fetching data"});
+            }else{
+                var totalPages = Math.ceil(totalCount/size);
+                has_prev = (page > 1);
+                has_next = (page < totalPages);
+                res.json({success:true,
+                          ballots:ballots,
+                          pagination:{
+                              current_page:page,
+                              total_pages:totalPages,
+                              has_prev:has_prev,
+                              has_next:has_next
+                          }}
+                )
+            }
+        });
+    })
 })

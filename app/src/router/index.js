@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Dashboard from '@/components/admin/Dashboard'
 import Login from '@/components/pages/Login'
-import Products from '@/components/pages/Products'
+import Ballots from '@/components/pages/Ballots'
 import CustomerOrders from '@/components/pages/CustomerOrders'
 
 Vue.use(Router)
@@ -30,9 +30,9 @@ export default new Router({
       meta: {requiresAuth: true},
       children:[
         {
-          path:'products',
-          name:'products',
-          component: Products,
+          path:'ballots',
+          name:'ballots',
+          component: Ballots,
         },
         {
           path: 'customer-orders',

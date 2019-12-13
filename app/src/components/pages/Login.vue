@@ -84,8 +84,7 @@ export default {
        this.$store.dispatch('login',this.user)
        .then((res)=>{
          if(res.data.success){
-            console.log('hihi')
-             vm.$router.push({path:'/admin/products'});
+             vm.$router.push({path:'/admin/ballots'});
          }
        })
      },

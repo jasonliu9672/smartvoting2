@@ -28,8 +28,8 @@ contract Voting {
         endTime = _eT;
         publicKey = _pK;
         for (uint i = 0; i<_vAddr.length; i++) {
-            voters[_vAddr[i]].id = i;
-            voters[_vAddr[i]].voted = false;
+            voters[_vAddr[i]].id = i+1;
+            voters[_vAddr[i]].voted = true;
         }
 
         for (uint i = 0; i < _can.length; i++) {
@@ -54,6 +54,21 @@ contract Voting {
 
     function verify () private returns (bool eligible) {
         eligible = true;
+    }
+
+    function checkTime () private view returns (bool) {
+        if (now > endTime || now < startTime) return false;
+        else return true;
+    }
+
+    function checkVotingID (uint ballotID) private view returns (bool) {
+        if (ballotID != votingID) return false;
+        else return true;
+    }
+
+    function checkVoter (address _voterAddr) private view returns (bool) {
+        if (voters[_voterAddr].id == 0) return false;
+        else return true;
     }
 
     function collectVotes () public view returns (bytes32 winningCandidates) {

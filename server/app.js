@@ -8,6 +8,8 @@ var blindSignature = require('blind-signatures');
 require('dotenv').config();
 
 var adminRouter = require('./src/routes/admin');
+var ballotRouter = require('./src/routes/ballot');
+
 const corsOptions={
 	origin: [
 		'http://localhost:8080',
@@ -30,6 +32,7 @@ app.use(session({
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use('/admin',adminRouter);
+app.use('/ballots',ballotRouter);
 //mongodb  setup
 // mongoose.connect(uri, {
 //     useUnifiedTopology: true,

@@ -8,7 +8,7 @@
             <thead>
                 <th width="150">title</th>
                 <th width="100">number of district</th>
-                <th width="100"> number of candidate</th>
+                <th width="100">number of candidate</th>
                 <th width="100">start time</th>
                 <th width="100">end time</th>
                 <th width="150">key</th>
@@ -56,9 +56,9 @@
                                 placeholder="please enter title" v-model="tempBallot.title">
                         </div>
                         <div class="form-group">
-                            <label for="title">title</label>
-                            <input type="text" class="form-control" id="title"
-                                placeholder="please enter title" v-model="tempBallot.title">
+                            <label for="candidates">candidates</label>
+                            <input type="text" class="form-control" id="candidates"
+                                placeholder="please enter candidates" v-model="tempBallot.candidates">
                         </div>
                         <div class="form-group">
                             <label for="districts">districts</label>
@@ -70,13 +70,11 @@
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="starttime">Start Time</label>
-                                <input type="text" class="form-control" id="starttime"
-                                placeholder="enter start time" v-model="tempBallot.startTime">
+                                <datepicker id="starttime" placeholder="Select Date" v-model="tempBallot.startTime"></datepicker>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="endtime">End Time</label>
-                                <input type="number" class="form-control" id="endtime"
-                                placeholder="enter end time" v-model="tempBallot.endTime">
+                                <datepicker id="endtime" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker>
                             </div>
                         </div>
                         <hr>
@@ -143,6 +141,7 @@
 
 <script>
 import $ from 'jquery';
+import Datepicker from 'vuejs-datepicker';
 export default {
     data(){
         return{
@@ -156,9 +155,12 @@ export default {
             }
         };
     },
+    components:{
+        Datepicker
+    },
     methods:{
         getBallots(page = 1){
-            const api = `${process.env.APIPATH}/get-ballots/ballots?page=${page}`;
+            const api = `${process.env.APIPATH}/ballots?page=${page}`;
             const vm = this;
             vm.isLoading = true;
             this.$http.get(api).then((response)=>{
@@ -185,7 +187,7 @@ export default {
         },
         delBallot(){
             const vm = this;
-            const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
+            const api = `${process.env.APIPATH}/ballots/${vm.tempProduct.id}`;
             this.$http.delete(api).then((response)=>{
                 console.log(response.data,vm.tempBallot);
                 $('#delBallotModal').modal('hide');
@@ -193,11 +195,11 @@ export default {
             })
         },
         updateBallot(){
-            let api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product`;
+            let api = `${process.env.APIPATH}/ballots`;
             let httpMethod = 'post';
             const vm = this;
             if(!vm.isNew){
-                api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
+                api = `${process.env.APIPATH}/ballots/${vm.tempProduct.id}`;
                 httpMethod = 'put'
             }
             this.$http[httpMethod](api,{data:vm.tempBallot}).then((response)=>{
@@ -212,28 +214,6 @@ export default {
                 }
             })
         },
-        uploadFile(){
-            console.log(this);
-            const uploadedFile = this.$refs.files.files[0];
-            const vm=this;
-            const formData = new FormData();
-            formData.append('file-to-upload',uploadedFile);
-            const url = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
-            vm.status.fileUploading = true;
-            this.$http.post(url,formData,{
-                headers:{
-                    'Content-Type':'multipart/form-data'
-                }
-            }).then((response)=>{
-                console.log(response.data);
-                vm.status.fileUploading = false;
-                if(response.data.success){
-                    vm.$set(vm.tempBallot,'imageUrl',response.data.imageUrl);
-                }else{
-                    this.$bus.$emit('message:push',response.data.message,'danger');
-                }
-            })
-        }
     },
     created(){
         this.getBallots();

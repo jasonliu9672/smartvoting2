@@ -4,7 +4,7 @@ var router = express.Router();
 var blindSignature = require('blind-signatures');
 var {check, validationResult } = require('express-validator');
 
-router.post('/create-ballot', [
+router.post('/', [
     check('starttime').isAfter().withMessage('chosen date is not a valid date'),
     check('endtime').isAfter().withMessage('chosen date is not a valid date')
 ],(req,res) =>{
@@ -33,26 +33,59 @@ router.post('/create-ballot', [
             message:"Ballot is created."});
     }
 })
-router.put('/update-ballot/:id', (req,res) =>{
+router.put('/:id', (req,res) =>{
     var target_id = req.params.id;
-    Ballot.findByIdAndUpdate({id:target_id})
+    var ballot = req.body;
+    var update = {
+        title: ballot.title,
+        candidates: ballot.candidates,
+        districts: ballot.districts,
+        starttime: ballot.starttime,
+        endtime: ballot.endtime,
+        description: ballot.description,
+        key: ballot.new_key
+    }
+    Ballot.findOneAndUpdate({id:target_id},update,function(doc){
+        if(doc){
+            res.json({success:true,
+                message:"Ballot is updated."});
+        }
+        else{
+            res.json({success:false,
+                message:"Ballot is not updated."});
+        }
+    })
 })
-router.get('/get-ballots/ballots:page',(req,res) =>{
+router.delete('/:id', (req,res) =>{
+    var id = req.params.id;
+    Ballot.deleteOne({id:id},function(ok){
+        if(ok){
+            res.json({success:true,
+                message:"Ballot deleted."});
+        }
+        else{
+            res.json({success:false,
+                message:"Error deleting data."});
+        }
+    })
+})
+router.get('/',(req,res) =>{
+    console.log('hi')
     const size = 9; // results per page
-    const page = req.params.page || 1;
+    const page = req.query.page || 1;
     var query = {};
     var has_prev,has_next;
     query.skip = size * (page-1);
     query.limit = size;
-    Ballot.count({},function(err,totalCount){
+    Ballot.countDocuments({},function(err,totalCount){
         if(err){
             res.json({success:false,
-                    message:"Error fetching data"});
+                    message:"Error fetching data."});
         }
         Ballot.find({},{},query,function(err,ballots){
             if(err){
                 res.json({success:false,
-                        message:"Error fetching data"});
+                        message:"Error fetching data."});
             }else{
                 var totalPages = Math.ceil(totalCount/size);
                 has_prev = (page > 1);
@@ -70,3 +103,4 @@ router.get('/get-ballots/ballots:page',(req,res) =>{
         });
     })
 })
+module.exports = router;

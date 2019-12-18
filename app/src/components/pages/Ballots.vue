@@ -2,10 +2,10 @@
     <div>
         <loading :active.sync="isLoading" ></loading>
         <div class="text-right">
-            <button class="btn btn-info" @click="openModal(true)">Create New Ballot</button>
+            <button class="btn btn-info mt-3" @click="openModal(true)">Create New Ballot</button>
         </div>
-        <table class="table mt-4">
-            <thead>
+        <table class="table mt-4 table-dark table-striped table-hover">
+            <thead class="thead-light">
                 <th width="150">title</th>
                 <th width="100">number of district</th>
                 <th width="100">number of candidate</th>
@@ -39,59 +39,64 @@
             aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content border-0">
-                <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                    <span>create new ballot</span>
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="title">title</label>
-                            <input type="text" class="form-control" id="title"
-                                placeholder="please enter title" v-model="tempBallot.title">
-                        </div>
-                        <div class="form-group">
-                            <label for="candidates">candidates</label>
-                            <input type="text" class="form-control" id="candidates"
-                                placeholder="please enter candidates" v-model="tempBallot.candidates">
-                        </div>
-                        <div class="form-group">
-                            <label for="districts">districts</label>
-                            <input type="number" class="form-control" id="districts"
-                                placeholder="please enter districts" v-model="tempBallot.districts">
+                    <div class="modal-header bg-dark text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">
+                        <span>create new ballot</span>
+                        </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="title">Title</label>
+                                    <input type="text" class="form-control" id="title"
+                                        placeholder="please enter title" v-model="tempBallot.title">
+                                </div>
+                                <div class="form-group">
+                                    <div>
+                                        <label class="typo__label">Candidates</label>
+                                        <multiselect id="candidates" v-model="tempBallot.candidates" :options="candidateList" :multiple="true" :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="select candidates" label="name" track-by="name" :preselect-first="true">
+                                            <template slot="selection" slot-scope="{ values, search, isOpen }"><span class="multiselect__single" v-if="values.length &amp;&amp; !isOpen">{{ values.length }} candidate selected</span></template>
+                                        </multiselect>
+                                        <!-- <pre class="language-json"><code></code></pre> -->
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="districts">Districts</label>
+                                    <input type="number" class="form-control" id="districts"
+                                        placeholder="please enter districts" v-model="tempBallot.districts">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="starttime">Start Time</label>
+                                        <date-picker id="starttime" name="date" v-model="tempBallot.startTime" :config="options"></date-picker>
+                                        <!-- <datepicker id="starttime" placeholder="Select Date" v-model="tempBallot.startTime"></datepicker> -->
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="endtime">End Time</label>
+                                        <date-picker id="endtime" name="date" v-model="tempBallot.endTime" :config="options"></date-picker>
+                                        <!-- <datepicker id="endtime" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker> -->
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <textarea class="form-control" id="description" rows="5" cols="45" v-model="tempBallot.description"></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="starttime">Start Time</label>
-                                <datepicker id="starttime" placeholder="Select Date" v-model="tempBallot.startTime"></datepicker>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="endtime">End Time</label>
-                                <datepicker id="endtime" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="description">description</label>
-                                <textarea class="form-control" id="description" rows="3" v-model="tempBallot.description"></textarea>
-                            </div>
-                        </div>
-                        <hr>
-                        </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" @click="updateBallot">Confirm</button>
                     </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" @click="updateBallot">Confirm</button>
                 </div>
             </div>
         </div>
@@ -140,8 +145,26 @@
 </template>
 
 <script>
-import $ from 'jquery';
-import Datepicker from 'vuejs-datepicker';
+import $ from 'jquery'
+import Datepicker from 'vuejs-datepicker'
+import Multiselect from 'vue-multiselect'
+import 'bootstrap/dist/css/bootstrap.css';
+// Import this component
+import datePicker from 'vue-bootstrap-datetimepicker';
+// Import date picker css
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+$.extend(true, $.fn.datetimepicker.defaults, {
+  icons: {
+    time: 'far fa-clock',
+    date: 'far fa-calendar',
+    down: 'fas fa-arrow-down',
+    previous: 'fas fa-chevron-left',
+    next: 'fas fa-chevron-right',
+    today: 'fas fa-calendar-check',
+    clear: 'far fa-trash-alt',
+    close: 'far fa-times-circle'
+  }
+});
 export default {
     data(){
         return{
@@ -152,11 +175,20 @@ export default {
             isLoading: false,
             status:{
                 fileUploading: false,
+            },
+            candidateList:[],
+             options: {
+            format: 'DD/MM/YYYY h:mm:ss',
+                useCurrent: false,
+                showClear: true,
+                showClose: true,
             }
         };
     },
     components:{
-        Datepicker
+        Datepicker,
+        Multiselect,
+        datePicker
     },
     methods:{
         getBallots(page = 1){
@@ -170,7 +202,16 @@ export default {
             vm.pagination = response.data.pagination;
             })
         },
+        getCandidateList(){
+            const api = `${process.env.APIPATH}/candidates/list`;
+            const vm =this;
+            this.$http.get(api).then((response)=>{
+                console.log(response.data);
+                vm.candidateList = response.data.candidateList;
+            })
+        },
         openModal(isNew, ballot){
+            this.getCandidateList();
             $('#newballotModal').modal('show');
             if(isNew){
                 this.tempBallot = {};
@@ -187,7 +228,7 @@ export default {
         },
         delBallot(){
             const vm = this;
-            const api = `${process.env.APIPATH}/ballots/${vm.tempProduct.id}`;
+            const api = `${process.env.APIPATH}/ballots/${vm.tempBallot.id}`;
             this.$http.delete(api).then((response)=>{
                 console.log(response.data,vm.tempBallot);
                 $('#delBallotModal').modal('hide');
@@ -199,7 +240,7 @@ export default {
             let httpMethod = 'post';
             const vm = this;
             if(!vm.isNew){
-                api = `${process.env.APIPATH}/ballots/${vm.tempProduct.id}`;
+                api = `${process.env.APIPATH}/ballots/${vm.tempBallot.id}`;
                 httpMethod = 'put'
             }
             this.$http[httpMethod](api,{data:vm.tempBallot}).then((response)=>{
@@ -220,3 +261,6 @@ export default {
     }
 }
 </script>
+<style src="vue-multiselect/dist/vue-multiselect.min.css">
+
+</style>

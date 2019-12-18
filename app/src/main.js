@@ -9,7 +9,7 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 // Import fontawesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSpinner,faBoxOpen,faUser,faKey } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner,faBoxOpen,faUser,faKey,faCalendar,faClock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 //Import custom dependencies
@@ -19,14 +19,15 @@ import './bus';
 import currencyFilter from './filters/currency'
 import store from './store'
 
-library.add(faSpinner,faBoxOpen,faUser,faKey);
-Vue.component('font-awesome-icon', FontAwesomeIcon);
+library.add(faSpinner,faBoxOpen,faUser,faKey,faClock,faCalendar);
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 Vue.use(Vuex);
+Vue.use(require('vue-moment'));
 
 Vue.component('Loading',Loading);
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.filter('currency',currencyFilter);
 
 axios.defaults.withCredentials = true;

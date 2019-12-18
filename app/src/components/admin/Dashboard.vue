@@ -5,7 +5,7 @@
       <div class="container-fluid">
         <div class="row">
           <Sidebar/>
-          <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+          <main id="main-component" role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
           <router-view></router-view>
           </main>
         </div>
@@ -30,3 +30,12 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+// main{
+//    background-image: url("../../assets/backgroundImage2.jpg");
+//    height: 100%;
+//     background-position: center;
+//     background-repeat: no-repeat;
+//     background-size: cover;
+// }
+</style>

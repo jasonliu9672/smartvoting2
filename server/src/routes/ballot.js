@@ -9,14 +9,14 @@ router.post('/', [
     check('endtime').isAfter().withMessage('chosen date is not a valid date')
 ],(req,res) =>{
     const errors =validationResult(req);
-    var title = req.body.title;
-    var candidates = req.body.candidates;
-    var districts = req.body.districts;
-    var starttime = req.body.starttime;
-    var endtime = req.body.endtime;
-    var description = req.body.description;
+    var title = req.body.data.title;
+    var candidates = req.body.data.candidates;
+    var districts = req.body.data.districts;
+    var starttime = req.body.data.starttime;
+    var endtime = req.body.data.endtime;
+    var description = req.body.data.description;
     if(!errors.isEmpty()){
-        return res.status(422).json({errors: errors.array()});
+        return res.status(422).json({success:false, errors: errors.array()});
     }
     else{
         new_key = blindSignature.keyGeneration({b:2048});
@@ -70,7 +70,6 @@ router.delete('/:id', (req,res) =>{
     })
 })
 router.get('/',(req,res) =>{
-    console.log('hi')
     const size = 9; // results per page
     const page = req.query.page || 1;
     var query = {};

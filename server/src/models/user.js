@@ -1,4 +1,4 @@
-const mongoose  = require('../db')
+const mongoose  = require('../db').mongoose
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 

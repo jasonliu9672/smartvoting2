@@ -1,14 +1,14 @@
 var express     = require('express');
-//var mongoose = require('mongoose');
 var session = require('express-session');
 var bodyParser = require('body-parser');
-var mongoose = require('./src/db');
+// var mongoose = require('./src/db');
 var cors = require('cors');
 var blindSignature = require('blind-signatures');
 require('dotenv').config();
 
 var adminRouter = require('./src/routes/admin');
 var ballotRouter = require('./src/routes/ballot');
+var candidateRouter = require('./src/routes/candidate');
 
 const corsOptions={
 	origin: [
@@ -33,6 +33,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use('/admin',adminRouter);
 app.use('/ballots',ballotRouter);
+app.use('/candidates',candidateRouter);
 //mongodb  setup
 // mongoose.connect(uri, {
 //     useUnifiedTopology: true,

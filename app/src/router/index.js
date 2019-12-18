@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Dashboard from '@/components/admin/Dashboard'
 import Login from '@/components/pages/Login'
 import Ballots from '@/components/pages/Ballots'
-import CustomerOrders from '@/components/pages/CustomerOrders'
+import Candidates from '@/components/pages/Candidates'
 
 Vue.use(Router)
 
@@ -31,13 +31,13 @@ export default new Router({
       children:[
         {
           path:'ballots',
-          name:'ballots',
+          name:'Ballots',
           component: Ballots,
         },
         {
-          path: 'customer-orders',
-          name: 'CustomerOrders',
-          component: CustomerOrders,
+          path: 'candidates',
+          name: 'Candidates',
+          component: Candidates,
         }
       ]
     },

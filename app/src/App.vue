@@ -26,10 +26,10 @@ export default {
 <style lang="scss">
 @import "./assets/all.scss";
 body{
-      background-image: url("assets/backgroundImage2.jpg");
-      height: 100%;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
+       background: url("assets/backgroundImage2.jpg") no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 }
 </style>

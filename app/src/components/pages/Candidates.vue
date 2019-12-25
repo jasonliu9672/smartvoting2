@@ -17,12 +17,12 @@
                         </ul>
                     </div>
                     <div class="card-footer d-flex">
-                    <button type="button" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-spinner fa-spin"></i>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" @click="openModal(false,candidate)">
+                        <!-- <i class="fas fa-spinner fa-spin"></i> -->
                         Edit
                     </button>
                     <button type="button" class="btn btn-outline-danger btn-sm ml-auto" @click="openDelCandidateModal(candidate)">
-                        <i class="fas fa-spinner fa-spin"></i>
+                        <!-- <i class="fas fa-spinner fa-spin"></i> -->
                         Delete
                     </button>
                     </div>

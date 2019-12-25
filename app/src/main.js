@@ -11,6 +11,11 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSpinner,faBoxOpen,faUser,faKey,faCalendar,faClock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import 'bootstrap/dist/css/bootstrap.css'
+// Import this component
+import datePicker from 'vue-bootstrap-datetimepicker'
+// Import date picker css
+import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css'
 
 //Import custom dependencies
 import App from './App'
@@ -26,6 +31,7 @@ Vue.use(VueAxios, axios);
 Vue.use(Vuex);
 Vue.use(require('vue-moment'));
 
+Vue.use(datePicker);
 Vue.component('Loading',Loading);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.filter('currency',currencyFilter);

@@ -73,14 +73,16 @@
                             <div class="col-sm-6">
                                 <div class="form-row">
                                     <div class="form-group col-md-6">
-                                        <label for="starttime">Start Time</label>
-                                        <date-picker id="starttime" name="date" v-model="tempBallot.startTime" :config="options"></date-picker>
-                                        <!-- <datepicker id="starttime" placeholder="Select Date" v-model="tempBallot.startTime"></datepicker> -->
+                                        <label for="starttime">Start Date</label>
+                                        <date-picker id="starttime" name="date" v-model="tempBallot.starttime" :config="options"></date-picker>
+                                        <!--<datepicker id="starttime" placeholder="Select Date" v-model="tempBallot.startTime"></datepicker> -->
+                                        <p>{{tempBallot.starttime}}</p>
                                     </div>
                                     <div class="form-group col-md-6">
-                                        <label for="endtime">End Time</label>
-                                        <date-picker id="endtime" name="date" v-model="tempBallot.endTime" :config="options"></date-picker>
-                                        <!-- <datepicker id="endtime" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker> -->
+                                        <label for="endtime">End Date</label>
+                                        <date-picker id="endtime" name="date" v-model="tempBallot.endtime" :config="options"></date-picker>
+                                        <!-- <datepicker id="endtime" :format="customFormatter" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker> -->
+                                         <p>{{tempBallot.endtime}}</p>
                                     </div>
                                 </div>
                                 <hr>
@@ -148,11 +150,12 @@
 import $ from 'jquery'
 import Datepicker from 'vuejs-datepicker'
 import Multiselect from 'vue-multiselect'
-import 'bootstrap/dist/css/bootstrap.css';
-// Import this component
-import datePicker from 'vue-bootstrap-datetimepicker';
-// Import date picker css
+import moment from 'moment';
 import 'pc-bootstrap4-datetimepicker/build/css/bootstrap-datetimepicker.css';
+// Using font-awesome 5 icons
+import '@fortawesome/fontawesome-free/css/fontawesome.css';
+import '@fortawesome/fontawesome-free/css/regular.css';
+import '@fortawesome/fontawesome-free/css/solid.css';
 $.extend(true, $.fn.datetimepicker.defaults, {
   icons: {
     time: 'far fa-clock',
@@ -178,7 +181,8 @@ export default {
             },
             candidateList:[],
              options: {
-            format: 'DD/MM/YYYY h:mm:ss',
+                date: null,
+                format: 'DD/MM/YYYY h A',
                 useCurrent: false,
                 showClear: true,
                 showClose: true,
@@ -188,9 +192,12 @@ export default {
     components:{
         Datepicker,
         Multiselect,
-        datePicker
+        //datePicker
     },
     methods:{
+        customFormatter(date) {
+            return moment(date).format('MMMM Do YY');
+        },
         getBallots(page = 1){
             const api = `${process.env.APIPATH}/ballots?page=${page}`;
             const vm = this;
@@ -251,7 +258,6 @@ export default {
                 }else{
                     $('#newballotModal').modal('hide');
                     vm.getBallots();
-                    console.log('新增失敗');
                 }
             })
         },

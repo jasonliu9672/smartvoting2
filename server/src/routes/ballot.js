@@ -15,7 +15,9 @@ router.post('/', [
     var starttime = req.body.data.starttime;
     var endtime = req.body.data.endtime;
     var description = req.body.data.description;
+    console.log(starttime);
     if(!errors.isEmpty()){
+        console.log("date is not right")
         return res.status(422).json({success:false, errors: errors.array()});
     }
     else{

@@ -15,12 +15,12 @@ const BallotSchema  = mongoose.Schema({
         type: Number,//change to Number array in the future
         required: true,
     },
-    startTime:{
+    starttime:{
         type: Date,
         default: Date.now,
         required: true
     },
-    endTime:{
+    endtime:{
         type: Date,
         required: true
     },

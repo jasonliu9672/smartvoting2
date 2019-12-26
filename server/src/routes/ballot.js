@@ -4,21 +4,19 @@ var router = express.Router();
 var blindSignature = require('blind-signatures');
 var {check, validationResult } = require('express-validator');
 
-router.post('/', [
-    check('starttime').isAfter().withMessage('chosen date is not a valid date'),
-    check('endtime').isAfter().withMessage('chosen date is not a valid date')
-],(req,res) =>{
-    const errors =validationResult(req);
+router.post('/',(req,res) =>{
     var title = req.body.data.title;
-    var candidates = req.body.data.candidates;
+    var candidates = Object.values(req.body.data.candidates).map(item => item.code);
     var districts = req.body.data.districts;
     var starttime = req.body.data.starttime;
     var endtime = req.body.data.endtime;
     var description = req.body.data.description;
-    console.log(starttime);
-    if(!errors.isEmpty()){
+    // console.log(new Date(starttime));
+    // console.log(typeof(starttime));
+    console.log(Date.parse(starttime),Date.parse(endtime),Date.now());
+    if( Date.parse(starttime) < Date.now() && Date.parse(endtime) < Date.now() && Date.parse(starttime) >= Date.parse(endtime) ){
         console.log("date is not right")
-        return res.status(422).json({success:false, errors: errors.array()});
+        return res.status(422).json({success:false, message:"date is not right"});
     }
     else{
         new_key = blindSignature.keyGeneration({b:2048});

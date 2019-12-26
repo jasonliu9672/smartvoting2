@@ -82,7 +82,7 @@
                                         <label for="endtime">End Date</label>
                                         <date-picker id="endtime" name="date" v-model="tempBallot.endtime" :config="options"></date-picker>
                                         <!-- <datepicker id="endtime" :format="customFormatter" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker> -->
-                                         <p>{{tempBallot.endtime}}</p>
+                                         <p>{{tempTime}}</p>
                                     </div>
                                 </div>
                                 <hr>
@@ -176,6 +176,7 @@ export default {
             tempBallot: {},
             isNew: false,
             isLoading: false,
+            current: null,
             status:{
                 fileUploading: false,
             },
@@ -246,11 +247,15 @@ export default {
             let api = `${process.env.APIPATH}/ballots`;
             let httpMethod = 'post';
             const vm = this;
+            let newballot = Object.assign({},vm.tempBallot);
+            newballot.endtime = vm.tempTime.endobject;
+            console.log(typeof(newballot.endtime));
+            newballot.starttime = vm.tempTime.startobject;
             if(!vm.isNew){
-                api = `${process.env.APIPATH}/ballots/${vm.tempBallot.id}`;
+                api = `${process.env.APIPATH}/ballots/${newballot.id}`;
                 httpMethod = 'put'
             }
-            this.$http[httpMethod](api,{data:vm.tempBallot}).then((response)=>{
+            this.$http[httpMethod](api,{data:newballot}).then((response)=>{
                 console.log(response.data);
                 if(response.data.success){
                     $('#newballotModal').modal('hide');
@@ -262,8 +267,43 @@ export default {
             })
         },
     },
+    computed:{
+        tempTime: function(){
+            let start = this.tempBallot.starttime;
+            let end = this.tempBallot.endtime;
+            let start_array,end_array,starthour,endhour, startdate,enddate;
+            let startobject, endobject;
+            if(start && end){
+                start_array = start.split(" ");
+                end_array = end.split(" ");
+                startdate = start_array[0].split("/");
+                enddate = end_array[0].split("/");
+                if(start_array[2] == "PM" && start_array[1] != 12){
+                    starthour = parseInt(start_array[1]) + 12;
+                }
+                else{
+                    starthour = parseInt(start_array[1]);
+                }
+                if(end_array[2] == "PM" && end_array[1] != 12){
+                    endhour = parseInt(end_array[1]) + 12;
+                }
+                else{
+                    endhour = parseInt(end_array[1]);
+                }
+                startobject = new Date(parseInt(startdate[2]),parseInt(startdate[1])-1,parseInt(startdate[0]),starthour,0,0);
+                endobject = new Date(parseInt(enddate[2]),parseInt(enddate[1])-1,parseInt(enddate[0]),endhour,0,0);
+                // startobject = new Date(2020,1,20,10,0,0);
+                // endobject = new Date(2020,1,20,10,0,0);
+                startobject = startobject.toUTCString();
+                endobject = endobject.toUTCString();
+                // console.log(parseInt(enddate[2]),parseInt(enddate[1]),parseInt(enddate[0]),endhour)
+            }
+            return {startobject,endobject}
+        }
+    },
     created(){
         this.getBallots();
+        this.current = new Date();
     }
 }
 </script>

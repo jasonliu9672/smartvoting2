@@ -31,6 +31,10 @@ const BallotSchema  = mongoose.Schema({
     key:{
         type: Object,
         required: true
+    },
+    is_deployed:{
+        type: Boolean,
+        require: true
     }
 })
 BallotSchema.plugin(autoincrement,{inc_field:'id'});

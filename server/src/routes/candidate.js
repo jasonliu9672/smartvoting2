@@ -14,9 +14,16 @@ router.post('/',(req,res) =>{
         age:age,
         dob:dob,
         title:title
+    },function(err){
+        if(err){
+            res.json({success:false,
+                message:"add candidate failed."});
+        }
+        else{
+            res.json({success:true,
+                message:"Candidate is added."});
+        }
     })
-    res.json({success:true,
-        message:"Candidate is added."});
 });
 router.put('/:id', (req,res) =>{
     var target_id = req.params.id;

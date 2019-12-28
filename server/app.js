@@ -54,7 +54,7 @@ app.use('/candidates',candidateRouter);
 
 
 app.listen(port,() =>{
-	new_key = blindSignature.keyGeneration({b:2048});
-	console.log(typeof(new_key),new_key);
+	// new_key = blindSignature.keyGeneration({b:2048});
+	// console.log(typeof(new_key),new_key);
 	console.log('server is up on ' + port);
 })

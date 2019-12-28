@@ -4,29 +4,38 @@
         <div class="text-right">
             <button class="btn btn-info mt-3" @click="openModal(true)">Create New Ballot</button>
         </div>
-        <table class="table mt-4 table-dark table-striped table-hover">
-            <thead class="thead-light">
-                <th width="150">title</th>
-                <th width="100">number of district</th>
-                <th width="100">number of candidate</th>
-                <th width="100">start time</th>
-                <th width="100">end time</th>
-                <th width="150">key</th>
+        <table id="ballot-table" class="table mt-4 table-striped table-hover">
+            <thead class="thead-light text-center" style="text-transform:uppercase">
+                <th width=11% >title</th>
+                <th width=15% >candidates</th>
+                <th width=11% >district</th>
+                <th width=11% >start time</th>
+                <th width=11% >end time</th>
+                <th width=5% >key</th>
+                <th width=15% >description</th>
+                <th width=5% >status</th>
+                <th></th>
             </thead>
-            <tbody>
-                <tr v-for="(ballot) in ballots" :key="ballot.id">
-                    <td>{{ballot.title}}</td>
+            <tbody class="text-center">
+                <tr v-for="(ballot) in ballots" :key="ballot.id" class="bg-white">
+                    <td class="bg-white text-center align-middle">{{ballot.title}}</td>
                     <td>{{ballot.candidates}}</td>
                     <td>{{ballot.districts}}</td>
-                    <td class="text-right">
-                        {{ballot.startTime}}
-                    </td>
-                    <td class="text-right">
-                        {{ballot.endTime}}
+                    <td>
+                        {{ballot.starttime}}
                     </td>
                     <td>
-                        <span v-if="item.is_enabled" class="text-success">deployed</span>
-                        <span v-else>undeployed</span>
+                        {{ballot.endtime}}
+                    </td>
+                    <td>
+                       <font-awesome-icon icon="key" class="key-hover text-warning" size="lg" @click="openKeyModal(ballot)"/>
+                    </td>
+                    <td>
+                        {{ballot.description}}
+                    </td>
+                    <td>
+                        <span v-if="ballot.is_deployed" class="text-success">deployed</span>
+                        <span v-else><button class="btn btn-success">deploy</button></span>
                     </td>
                     <td>
                         <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">edit</button>
@@ -76,13 +85,13 @@
                                         <label for="starttime">Start Date</label>
                                         <date-picker id="starttime" name="date" v-model="tempBallot.starttime" :config="options"></date-picker>
                                         <!--<datepicker id="starttime" placeholder="Select Date" v-model="tempBallot.startTime"></datepicker> -->
-                                        <p>{{tempBallot.starttime}}</p>
+                                        <!-- <p>{{tempBallot.starttime}}</p> -->
                                     </div>
                                     <div class="form-group col-md-6">
                                         <label for="endtime">End Date</label>
                                         <date-picker id="endtime" name="date" v-model="tempBallot.endtime" :config="options"></date-picker>
                                         <!-- <datepicker id="endtime" :format="customFormatter" placeholder="Select Date" v-model="tempBallot.endTime"></datepicker> -->
-                                         <p>{{tempTime}}</p>
+                                         <!-- <p>{{tempTime}}</p> -->
                                     </div>
                                 </div>
                                 <hr>
@@ -143,6 +152,28 @@
                 </div>
             </div>
         </div>
+        <div class="modal" id="KeyModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ballot Key</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div><span class="font-weight-bold">Public Key E: </span>{{currentKey.E}}</div>
+                    <hr>
+                    <div style="word-wrap:break-word"> <span class="font-weight-bold">Public Key N:</span> {{currentKey.N}}</div>
+                    <hr>
+                    <div style="word-wrap:break-word"><span class="font-weight-bold">Private Key D:</span> {{currentKey.D}}</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -174,6 +205,7 @@ export default {
             ballots: [],
             pagination: {},
             tempBallot: {},
+            currentKey:{},
             isNew: false,
             isLoading: false,
             current: null,
@@ -225,14 +257,19 @@ export default {
                 this.tempBallot = {};
                 this.isNew = true;
             }else{
-                this.tempBallot = Object.assign({}, item);
+                this.tempBallot = Object.assign({}, ballot);
                 this.isNew = false;
             }
         },
-        openDelBallotModal(item){
+        openDelBallotModal(ballot){
             const vm=this;
             $('#delBallotModal').modal('show');
-            vm.tempBallot = Object.assign({},item);
+            vm.tempBallot = Object.assign({},ballot);
+        },
+        openKeyModal(ballot){
+            const vm=this;
+            $('#KeyModal').modal('show');
+            vm.currentKey = Object.assign({},ballot.key);
         },
         delBallot(){
             const vm = this;
@@ -307,6 +344,18 @@ export default {
     }
 }
 </script>
-<style src="vue-multiselect/dist/vue-multiselect.min.css">
-
+<style src="vue-multiselect/dist/vue-multiselect.min.css" lang="scss">
+</style>
+<style lang="scss">
+.key-hover{
+    transition: transform 0.2s;
+    cursor:pointer;
+    &:hover{
+        transform: scale(2);
+        transform: rotate(45deg);
+    }
+}
+// #ballot-table{
+//     font-size:1rem;
+// }
 </style>

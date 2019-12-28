@@ -3,6 +3,7 @@ var Ballot = require('../models/ballot');
 var router = express.Router();
 var blindSignature = require('blind-signatures');
 var {check, validationResult } = require('express-validator');
+var NodeRSA = require('node-rsa');
 
 router.post('/',(req,res) =>{
     var title = req.body.data.title;
@@ -19,7 +20,7 @@ router.post('/',(req,res) =>{
         return res.status(422).json({success:false, message:"date is not right"});
     }
     else{
-        new_key = blindSignature.keyGeneration({b:2048});
+        var new_key = new NodeRSA({ b: 512 });
         Ballot.create({
             title: title,
             candidates: candidates,
@@ -27,10 +28,20 @@ router.post('/',(req,res) =>{
             starttime: starttime,
             endtime: endtime,
             description: description,
-            key: new_key
+            key: {E: new_key.keyPair.e.toString(),
+                  N: new_key.keyPair.n.toString(),
+                  D: new_key.keyPair.d.toString()},
+            is_deployed: false
+        }, function(err){
+            if (err){
+                res.json({success:false,
+                    message:"Ballot create failed"});
+            }
+            else{
+                res.json({success:true,
+                    message:"Ballot is created."});
+            }
         })
-        res.json({success:true,
-            message:"Ballot is created."});
     }
 })
 router.put('/:id', (req,res) =>{
@@ -43,7 +54,6 @@ router.put('/:id', (req,res) =>{
         starttime: ballot.starttime,
         endtime: ballot.endtime,
         description: ballot.description,
-        key: ballot.new_key
     }
     Ballot.findOneAndUpdate({id:target_id},update,function(doc){
         if(doc){

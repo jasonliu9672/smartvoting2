@@ -9,7 +9,7 @@ import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 // Import fontawesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faSpinner,faBoxOpen,faUser,faKey,faCalendar,faClock } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner,faBoxOpen,faUser,faKey,faCalendar,faClock} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import 'bootstrap/dist/css/bootstrap.css'
 // Import this component

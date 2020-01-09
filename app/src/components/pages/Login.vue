@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <form class="form-signin mt-5" @submit.prevent="login">
-        <h3 class="mb-3 font-weight-normal">Sign in</h3>
+        <h3 class="mb-3 font-weight-normal">E-Voting</h3>
         <div class="d-flex mb-3">
           <label for="inputUsername" class="sr-only">Username</label>
           <span class="align-self-center mx-2 input-prepend-icon"><font-awesome-icon icon="user" size="lg"/></span>
@@ -18,9 +18,13 @@
             </label>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
-        <button type="button" class="btn btn-lg btn-danger mt-3 btn-block " data-toggle="modal" data-target="#registerModal">
+        <!-- <button type="button" class="btn btn-lg btn-danger mt-3 btn-block " data-toggle="modal" data-target="#registerModal">
           Request Account
+        </button> -->
+        <button type="button" class="btn btn-lg mt-3 btn-block btn-info text-uppercase" :class="{'btn-danger': roleToggle }" @click="roleToggle = !roleToggle">
+          {{role}}
         </button>
+
         <p class="mt-5 mb-3 text-muted">&copy; 2017-2019</p>
     </form>
     <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -66,6 +70,7 @@ export default {
   name: 'login',
   data () {
     return {
+        roleToggle: false,
         user:{
             username:'',
             password:''
@@ -110,6 +115,11 @@ export default {
         }
         })
       }
+  },
+  computed:{
+    role:function(){
+      return (this.roleToggle ? "voter" : "ca");
+    }
   }
 }
 </script>

@@ -4,6 +4,42 @@ var router = express.Router();
 var blindSignature = require('blind-signatures');
 var {check, validationResult } = require('express-validator');
 var NodeRSA = require('node-rsa');
+var Web3 = require('web3');
+const contractUri = "http://localhost:7545";
+var provider = new Web3.providers.HttpProvider(contractUri);
+var contract = require("@truffle/contract");
+//const contract = require('truffle-contract');
+var VotingArtifacts = require("../../../Vote/build/contracts/Voting.json");
+
+const Voting = contract(VotingArtifacts);
+Voting.setProvider(provider);
+//Set an account for sending deployed contract
+Voting.defaults({
+   from: "0xeF299fab18F62e4413B818fB8af56ea038B4b099"
+});
+//const voting = Voting.at("0x6b17F32E623c15507E982204A59F97039773b117");
+router.get('/deploy', async (req, res) => {
+    console.log("Deploy");
+    const ballot = await Ballot.findOne({title: "Presidential Election"});
+    const title = ballot.title;
+    const id = 123;
+    const starttime = Date.parse(ballot.starttime);
+    const endtime = Date.parse(ballot.endtime);
+    const pKE = ballot.key.E;
+    const pKN = ballot.key.N;
+    const candidates = ballot.candidates;
+    const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
+    
+    const voting = await Voting.deployed();
+    try {
+        await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
+    } catch (err) {
+        console.log(err);
+    }
+    
+     
+    //console.log(result.logs[0].args.val.toNumber());
+})
 
 router.post('/',(req,res) =>{
     var title = req.body.data.title;

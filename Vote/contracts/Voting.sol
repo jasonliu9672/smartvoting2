@@ -1,4 +1,5 @@
-pragma solidity >=0.4.21;
+pragma solidity >=0.4.24;
+pragma experimental ABIEncoderV2;
 
 contract Voting {
     struct Voter {
@@ -9,7 +10,7 @@ contract Voting {
 
     struct Candidate {
         uint count;
-        bytes32 name;
+        string name;
         uint id;
     }
     address public owner;
@@ -17,16 +18,27 @@ contract Voting {
     uint votingID;
     uint startTime;
     uint endTime;
-    bytes32 publicKey;
+    uint publicKeyE;
+    uint publicKeyN; 
     mapping (address => Voter) voters; // eligible voters
     Candidate[] candidates; // eligible candidates
+    uint public value = 0;
+    event ValueSet(uint val);
+    function setValue(uint val) public {
+        value += val;
+        emit ValueSet(value);
+    }
+    function getValue() public view returns (uint) {
+        return value;
+    }
 
-    function create(string memory _vT, uint _vID, uint _sT, uint _eT, bytes32 _pK, address[] memory _vAddr, bytes32[] memory _can) public {
+    function create(string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint N, address[] memory _vAddr, string[] memory _can) public {
         votingTitle = _vT;
         votingID = _vID;
         startTime = _sT;
         endTime = _eT;
-        publicKey = _pK;
+        publicKeyE = E;
+        publicKeyN = N;
         for (uint i = 0; i<_vAddr.length; i++) {
             voters[_vAddr[i]].id = i+1;
             voters[_vAddr[i]].voted = true;
@@ -71,7 +83,7 @@ contract Voting {
         else return true;
     }
 
-    function collectVotes () public view returns (bytes32 winningCandidates) {
+    function collectVotes () public view returns (string memory winningCandidates) {
         //require(now > endTime );
         uint winningCount = 0;
         for (uint i = 0; i < candidates.length; i++) {

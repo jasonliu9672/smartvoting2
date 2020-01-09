@@ -35,7 +35,7 @@
                     </td>
                     <td>
                         <span v-if="ballot.is_deployed" class="text-success">deployed</span>
-                        <span v-else><button class="btn btn-success">deploy</button></span>
+                        <span v-else><button class="btn btn-success" @click="deploy()">deploy</button></span>
                     </td>
                     <td>
                         <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">edit</button>
@@ -228,6 +228,12 @@ export default {
         //datePicker
     },
     methods:{
+        deploy() {
+            const api = `${process.env.APIPATH}/ballots/deploy`;
+            this.$http.get(api).then(() => {
+                console.log("123");
+            })
+        },
         customFormatter(date) {
             return moment(date).format('MMMM Do YY');
         },

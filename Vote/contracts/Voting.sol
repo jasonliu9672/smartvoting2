@@ -1,4 +1,4 @@
-pragma solidity >=0.4.24;
+pragma solidity >=0.4.25;
 pragma experimental ABIEncoderV2;
 
 contract Voting {
@@ -19,7 +19,7 @@ contract Voting {
     uint startTime;
     uint endTime;
     uint publicKeyE;
-    uint publicKeyN; 
+    uint publicKeyN;
     mapping (address => Voter) voters; // eligible voters
     Candidate[] candidates; // eligible candidates
     uint public value = 0;
@@ -32,23 +32,18 @@ contract Voting {
         return value;
     }
 
-    function create(string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint N, address[] memory _vAddr, string[] memory _can) public {
+    constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint N, string[] memory _can) public {
         votingTitle = _vT;
         votingID = _vID;
         startTime = _sT;
         endTime = _eT;
         publicKeyE = E;
         publicKeyN = N;
-        for (uint i = 0; i<_vAddr.length; i++) {
-            voters[_vAddr[i]].id = i+1;
-            voters[_vAddr[i]].voted = true;
-        }
-
-        for (uint i = 0; i < _can.length; i++) {
+        for (uint j = 0; j < _can.length; j++) {
             candidates.push(Candidate({
                 count: 0,
-                name: _can[i],
-                id: i
+                name: _can[j],
+                id: j
             }));
         }
         owner = msg.sender;

@@ -35,11 +35,14 @@
                     </td>
                     <td>
                         <span v-if="ballot.is_deployed" class="text-success">deployed</span>
-                        <span v-else><button class="btn btn-success">deploy</button></span>
+                        <span v-else><button class="btn btn-danger" @click="deploy(ballot.id)">deploy</button></span>
                     </td>
                     <td>
-                        <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">edit</button>
-                        <button class="btn btn-outline-danger btn-sm" @click="openDelBallotModal(ballot)">delete</button>
+                        <template v-if="!ballot.is_deployed">
+                            <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">Edit</button>
+                            <button class="btn btn-outline-danger btn-sm" @click="openDelBallotModal(ballot)">Delete</button>
+                        </template>
+                        <button v-else class="btn btn-outline-danger btn-sm">Collect Vote</button>
                     </td>
                 </tr>
             </tbody>
@@ -228,6 +231,12 @@ export default {
         //datePicker
     },
     methods:{
+        deploy(id) {
+            const api = `${process.env.APIPATH}/ballots/deploy/${id}`;
+            this.$http.get(api).then(() => {
+                this.getBallots();
+            })
+        },
         customFormatter(date) {
             return moment(date).format('MMMM Do YY');
         },

@@ -9,6 +9,7 @@ require('dotenv').config();
 var adminRouter = require('./src/routes/admin');
 var ballotRouter = require('./src/routes/ballot');
 var candidateRouter = require('./src/routes/candidate');
+var voterRouter = require('./src/routes/voter');
 
 const corsOptions={
 	origin: [
@@ -34,6 +35,7 @@ app.use(bodyParser.json());
 app.use('/admin',adminRouter);
 app.use('/ballots',ballotRouter);
 app.use('/candidates',candidateRouter);
+app.use('/voter', voterRouter);
 //mongodb  setup
 // mongoose.connect(uri, {
 //     useUnifiedTopology: true,

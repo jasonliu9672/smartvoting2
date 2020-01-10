@@ -2,8 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Dashboard from '@/components/admin/Dashboard'
 import Login from '@/components/pages/Login'
-import Ballots from '@/components/pages/Ballots'
-import Candidates from '@/components/pages/Candidates'
+import AdminBallots from '@/components/admin/Ballots'
+import Candidates from '@/components/admin/Candidates'
+import VoterBallots from '@/components/voter/Ballots'
 
 Vue.use(Router)
 
@@ -31,8 +32,8 @@ export default new Router({
       children:[
         {
           path:'ballots',
-          name:'Ballots',
-          component: Ballots,
+          name:'AdminBallots',
+          component: AdminBallots,
         },
         {
           path: 'candidates',
@@ -40,6 +41,12 @@ export default new Router({
           component: Candidates,
         }
       ]
+    },
+    {
+      path: '/voter',
+      name: 'VoterBallots',
+      component: VoterBallots,
+      meta: {requiresAuth: true},
     },
   ]
 })

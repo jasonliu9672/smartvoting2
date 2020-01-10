@@ -70,7 +70,7 @@ export default {
   name: 'login',
   data () {
     return {
-        roleToggle: false,
+        roleToggle: false, //false is ca
         user:{
             username:'',
             password:''
@@ -89,7 +89,12 @@ export default {
        this.$store.dispatch('login',this.user)
        .then((res)=>{
          if(res.data.success){
-             vm.$router.push({path:'/admin/ballots'});
+            if(this.roleToggle){
+              vm.$router.push({path:'/voter'});
+            }
+            else{
+               vm.$router.push({path:'/admin/ballots'});
+            }
          }
        })
      },

@@ -14,6 +14,9 @@ router.get('/ballots',(req,res) =>{
                     message:"Error fetching data."});
         }
         Ballot.find({},{},query,function(err,ballots){
+            //only display deployed contract
+            ballots = ballots.filter(ballot => ballot.is_deployed)
+            //remove private key for voter 
             ballots.forEach(ballot => delete ballot.key.d)
             if(err){
                 res.json({success:false,

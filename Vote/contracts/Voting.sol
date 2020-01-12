@@ -104,15 +104,16 @@ contract Voting {
         else return true;
     }
 
-    function collectVotes () public view returns (string memory winningCandidates) {
+    function collectVotes () public view returns (string memory winningCandidate) {
         //require(now > endTime );
         uint winningCount = 0;
         for (uint i = 0; i < candidates.length; i++) {
             if (candidates[i].count > winningCount) {
                 winningCount = candidates[i].count;
-                winningCandidates = candidates[i].name;
+                winningCandidate = candidates[i].name;
             }
         }
-        return winningCandidates;
+        // return winningCandidate;
+        // return candidates[0].count;
     }
 }

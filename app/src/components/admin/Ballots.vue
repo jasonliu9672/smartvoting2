@@ -6,9 +6,9 @@
         </div>
         <table id="ballot-table" class="table mt-4 table-striped table-hover">
             <thead class="thead-light text-center" style="text-transform:uppercase">
+                <th width=6% >id</th>
                 <th width=11% >title</th>
                 <th width=15% >candidates</th>
-                <th width=11% >district</th>
                 <th width=11% >start time</th>
                 <th width=11% >end time</th>
                 <th width=5% >key</th>
@@ -18,9 +18,9 @@
             </thead>
             <tbody class="text-center">
                 <tr v-for="(ballot) in ballots" :key="ballot.id" class="bg-white">
-                    <td class="bg-white text-center align-middle">{{ballot.title}}</td>
+                    <td class="text-center align-middle">{{ballot.id}}</td>
+                    <td class="text-center align-middle">{{ballot.title}}</td>
                     <td class="align-middle">{{ballot.candidates}}</td>
-                    <td class="align-middle">{{ballot.districts}}</td>
                     <td class="align-middle">
                         {{ballot.starttime}}
                     </td>
@@ -34,13 +34,16 @@
                         {{ballot.description}}
                     </td>
                     <td >
-                        <h5 v-if="ballot.is_deployed"><span class="badge badge-success">deployed</span></h5>
+                        <div v-if="ballot.is_deployed">
+                             <h5><span class="badge badge-success">deployed</span></h5>
+                             <h6>contract address: {{ballot.contract_address}}</h6>
+                        </div>
                         <span v-else><button class="btn btn-danger" @click="deploy(ballot.id)">deploy</button></span>
                     </td>
                     <td>
                         <template v-if="!ballot.is_deployed">
                             <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">Edit</button>
-                            <button class="btn btn-outline-danger btn-sm" @click="openDelBallotModal(ballot)">Delete</button>
+                            <button class="btn btn-outline-danger btn-sm mt-1" @click="openDelBallotModal(ballot)">Delete</button>
                         </template>
                         <button v-else class="btn btn-outline-danger btn-sm" @click="collectVote(ballot)">Collect Vote</button>
                     </td>

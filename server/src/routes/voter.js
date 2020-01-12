@@ -42,7 +42,7 @@ router.get('/ballots',(req,res) =>{
 router.post('/sign/:id',(req,res) =>{
     var ballot_id = req.params.id;
     var vote_string = req.body.vote_string;
-    console.log(vote_string)
+    // console.log(vote_string)
     Ballot.findOne({id: ballot_id},function(err,ballot){
         if(err){
             console.log(err);
@@ -52,7 +52,7 @@ router.post('/sign/:id',(req,res) =>{
         let N = new BigInteger(ballot.key.N);
         let D = new BigInteger(ballot.key.D);
         vote = new BigInteger(vote_string);
-        console.log(vote)
+        // console.log(vote)
         const signed = vote.modPow(D,N).toString()
         res.json({success:true,
             signed_message:signed});

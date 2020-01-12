@@ -86,11 +86,11 @@ router.get('/test', async (req, res) => {
     const e = new BigInteger(ballot.key.E);
     const n = new BigInteger(ballot.key.N);
     var d = signedMsg.modPow(e,n);
-    console.log(d.toString());
+    console.log("d:" + d.toString());
     msgHash = sha256(msg);
     let messageInt = new BigInteger(msgHash, 16);
-    console.log(messageInt.toString());
-    console.log(msgHash);
+    console.log(n.toString());
+    console.log(msgHash.toString());
     console.log(signedMsg.toString());
     const voting = await Voting.deployed();
     const result = await voting.verify(msg, signed);
@@ -118,8 +118,8 @@ router.get('/deploy', async (req, res) => {
     try {
         //await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
         const result = await voting.getHash.call();
-        console.log(result[0]);
-        console.log(result[1]);
+        console.log(result[0].toString());
+        console.log(result[1].toString());
         //console.log(value);
         //res.json({success:true,
         //    contract_address: voting.options.address});

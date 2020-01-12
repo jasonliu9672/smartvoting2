@@ -2,11 +2,6 @@ pragma solidity >=0.4.25;
 pragma experimental ABIEncoderV2;
 
 contract Voting {
-    struct Voter {
-        uint id; // voter's id
-        bool voted; // whether the voter has voted or not
-        uint candidate; // the candidate that the voter votes for
-    }
 
     struct Candidate {
         uint count;
@@ -20,11 +15,12 @@ contract Voting {
     uint endTime;
     uint publicKeyE;
     bytes32 publicKeyN;
-    mapping (address => Voter) voters; // eligible voters
     Candidate[] candidates; // eligible candidates
     uint public value = 0;
     bytes32 msgHash;
     bytes32 verifyHash;
+    uint testString;
+    uint testmsg;
     event ValueSet(uint val);
     function setValue(uint val) public {
         value += val;
@@ -42,6 +38,9 @@ contract Voting {
     function getHash() public view returns(bytes32, bytes32){
         return (msgHash, verifyHash);
     }
+    //function getTest() public view returns (uint, uint) {
+    //    return (testString, testmsg);
+    //}
 
     constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, bytes32 N, string[] memory _can) public {
         votingTitle = _vT;
@@ -61,7 +60,6 @@ contract Voting {
     }
 
     function vote (uint candidate) public {
-        Voter storage sender = voters[msg.sender];
         //require(verify(), "Signature is wrong.");
         //require(!sender.voted, "Sender has been voted.");
         //sender.voted = true;
@@ -69,11 +67,28 @@ contract Voting {
         candidates[candidate].count += 1;
 
     }
-
+    
+    function modPow(uint _base, uint _exponent, uint _modulus) public pure returns(uint) {
+        uint result;
+        result = 1;
+        while(_exponent > 0){
+            if((_exponent & 1) == 1) result = mulmod(result, _base, _modulus);
+            _exponent = _exponent >> 1;
+            _base = mulmod(_base, _base, _modulus);
+        }
+        return result;
+    }
+    function sliceUint(bytes memory bs, uint start) internal pure returns (uint) {
+        require(bs.length >= start + 32, "slicing out of range");
+        uint x;
+        assembly {
+            x := mload(add(bs, add(0x20, start)))
+        }
+        return x;
+    }
     function verify (string memory message, string memory signedMessage) public returns (bool eligible) {
-        msgHash = sha256(message);
-        //rsaverify(msgHash, publicKeyN, publicKeyE, );
-        uint result = mulmod(uint(msgHash), publicKeyE, uint(publicKeyN));
+        msgHash = sha256(bytes(message));
+        uint result = modPow(sliceUint(bytes(signedMessage), 0), publicKeyE, uint(publicKeyN));
         verifyHash = bytes32(result);
         if (bytes32(result) == msgHash) eligible = true;
         else eligible = false;

@@ -5,6 +5,9 @@ contract("Voting", async accounts => {
         let voting = await Voting.deployed();
     })
     it ("Test Create Function", async () => {
+        const title = 'test';
+        const id = 1;
+        const a = 2;
         let voting = await Voting.deployed();
         
     })

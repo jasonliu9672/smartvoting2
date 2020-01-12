@@ -19,11 +19,7 @@ contract Voting {
     uint startTime;
     uint endTime;
     uint publicKeyE;
-<<<<<<< HEAD
-    uint256 publicKeyN; 
-=======
-    uint publicKeyN;
->>>>>>> b23950fe55ae3b8bc7ebb54f0818a55967ac3f38
+    uint256 publicKeyN;
     mapping (address => Voter) voters; // eligible voters
     Candidate[] candidates; // eligible candidates
     uint public value = 0;
@@ -35,24 +31,21 @@ contract Voting {
     function getValue() public view returns (uint) {
         return value;
     }
+    function getTime() public view returns (uint, uint) {
+        return (startTime, endTime);
+    }
+    function getKey() public view returns (uint, uint) {
+        return (publicKeyE, publicKeyN);
+    }
 
-<<<<<<< HEAD
-    function create(string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint N, string[] memory _can) public {
-=======
-    constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint N, string[] memory _can) public {
->>>>>>> b23950fe55ae3b8bc7ebb54f0818a55967ac3f38
+    constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint256 N, string[] memory _can) public {
         votingTitle = _vT;
         votingID = _vID;
         startTime = _sT;
         endTime = _eT;
         publicKeyE = E;
         publicKeyN = N;
-<<<<<<< HEAD
-
-        for (uint i = 0; i < _can.length; i++) {
-=======
         for (uint j = 0; j < _can.length; j++) {
->>>>>>> b23950fe55ae3b8bc7ebb54f0818a55967ac3f38
             candidates.push(Candidate({
                 count: 0,
                 name: _can[j],
@@ -64,15 +57,15 @@ contract Voting {
 
     function vote (uint candidate) public {
         Voter storage sender = voters[msg.sender];
-        require(verify(), "Signature is wrong.");
-        require(!sender.voted, "Sender has been voted.");
-        sender.voted = true;
-        sender.candidate = candidate;
+        //require(verify(), "Signature is wrong.");
+        //require(!sender.voted, "Sender has been voted.");
+        //sender.voted = true;
+        //sender.candidate = candidate;
         candidates[candidate].count += 1;
 
     }
 
-    function verify () private returns (bool eligible) {
+    function verify (string memory message, string memory signedMessage) private returns (bool eligible) {
         eligible = true;
     }
 

@@ -15,12 +15,11 @@ const input = fs.readFileSync(path.resolve(__dirname,'../../../Vote/contracts/Vo
 const output = solc.compile(input.toString());
 const bytecode = output.contracts[':'+'Voting'].bytecode;
 const abi = JSON.parse(output.contracts[':'+'Voting'].interface);
-
+/*
 router.get('/deploy/:id', async (req, res) => {
     var ballot_id = req.params.id;
     console.log(ballot_id)
     Ballot.findOne({id: ballot_id},function(err,ballot){
-        console.log
         if(err){
             res.json({success:false,
                 message:"DB Query Error"});
@@ -58,43 +57,47 @@ router.get('/deploy/:id', async (req, res) => {
         }
     });
 })
-// const contractUri = "http://localhost:7545";
-// var provider = new Web3.providers.HttpProvider(contractUri);
-// var contract = require("@truffle/contract");
-// //const contract = require('truffle-contract');
-// var VotingArtifacts = require("../../../Vote/build/contracts/Voting.json");
-
-// const Voting = contract(VotingArtifacts);
-// Voting.setProvider(provider);
-// //Set an account for sending deployed contract
-// Voting.defaults({
-//    from: "0x8b23a0a645aA706CAdF331065D453D856B19E6f6"
-// });
+*/
+const contractUri = "http://localhost:7545";
+var provider = new Web3.providers.HttpProvider(contractUri);
+var contract = require("@truffle/contract");
+//const contract = require('truffle-contract');
+var VotingArtifacts = require("../../../Vote/build/contracts/Voting.json");
+const BigNumber = require('bignumber.js');
+const Voting = contract(VotingArtifacts);
+Voting.setProvider(provider);
+//Set an account for sending deployed contract
+Voting.defaults({
+   from: "0xE3191cb2e046A74fEd41B5dA577171d04c6F4290"
+});
 //const voting = Voting.at("0x6b17F32E623c15507E982204A59F97039773b117");
-// router.get('/deploy', async (req, res) => {
-//     console.log("Deploy");
-//     const ballot = await Ballot.findOne({title: "Presidential Election"});
-//     const title = ballot.title;
-//     const id = 123;
-//     const starttime = Date.parse(ballot.starttime);
-//     const endtime = Date.parse(ballot.endtime);
-//     const pKE = ballot.key.E;
-//     const pKN = ballot.key.N;
-//     const candidates = ballot.candidates;
-//     const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
-    
-//     const voting = await Voting.deployed();
-//     try {
-//         await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
-//         res.json({success:true,
-//             contract_address: voting.options.address});
-//     } catch (err) {
-//         console.log(err);
-//     }
+router.get('/deploy', async (req, res) => {
+    console.log("Deploy");
+    const ballot = await Ballot.findOne({title: "Presidential Election"});
+    const title = ballot.title;
+    const id = 123;
+    const starttime = Date.parse(ballot.starttime);
+    const endtime = Date.parse(ballot.endtime);
+    const pKE = ballot.key.E;
+    const pKN = ballot.key.N;
+    const candidates = ballot.candidates;
+    const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
+    var value = web3.utils.toBN(ballot.key.N);
+    const voting = await Voting.deployed();
+    try {
+        //await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
+        const result = await voting.getKey.call();
+        console.log(result[0].toNumber());
+        console.log(result[1].eq(value));
+        //res.json({success:true,
+        //    contract_address: voting.options.address});
+    } catch (err) {
+        console.log(err);
+    }
     
      
-//     //console.log(result.logs[0].args.val.toNumber());
-// })
+    //console.log(result.logs[0].args.val.toNumber());
+})
 
 router.post('/',(req,res) =>{
     var title = req.body.data.title;

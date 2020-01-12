@@ -235,6 +235,7 @@ export default {
             const api = `${process.env.APIPATH}/ballots/deploy/${id}`;
             this.$http.get(api).then(() => {
                 this.getBallots();
+                this.$bus.$emit('message:push','deploy success!','success');
             })
         },
         customFormatter(date) {
@@ -304,9 +305,11 @@ export default {
             this.$http[httpMethod](api,{data:newballot}).then((response)=>{
                 console.log(response.data);
                 if(response.data.success){
+                    this.$bus.$emit('message:push','update successfully!','success');
                     $('#newballotModal').modal('hide');
                     vm.getBallots();
                 }else{
+                    this.$bus.$emit('message:push','update failed!','danger');
                     $('#newballotModal').modal('hide');
                     vm.getBallots();
                 }

@@ -19,22 +19,22 @@
             <tbody class="text-center">
                 <tr v-for="(ballot) in ballots" :key="ballot.id" class="bg-white">
                     <td class="bg-white text-center align-middle">{{ballot.title}}</td>
-                    <td>{{ballot.candidates}}</td>
-                    <td>{{ballot.districts}}</td>
-                    <td>
+                    <td class="align-middle">{{ballot.candidates}}</td>
+                    <td class="align-middle">{{ballot.districts}}</td>
+                    <td class="align-middle">
                         {{ballot.starttime}}
                     </td>
-                    <td>
+                    <td class="align-middle">
                         {{ballot.endtime}}
                     </td>
-                    <td>
+                    <td class="align-middle">
                        <font-awesome-icon icon="key" class="key-hover text-warning" size="lg" @click="openKeyModal(ballot)"/>
                     </td>
                     <td>
                         {{ballot.description}}
                     </td>
-                    <td>
-                        <span v-if="ballot.is_deployed" class="text-success">deployed</span>
+                    <td >
+                        <h5 v-if="ballot.is_deployed"><span class="badge badge-success">deployed</span></h5>
                         <span v-else><button class="btn btn-danger" @click="deploy(ballot.id)">deploy</button></span>
                     </td>
                     <td>

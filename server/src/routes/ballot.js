@@ -37,21 +37,25 @@ router.get('/deploy/:id', async (req, res) => {
             var candidates = ballot.candidates;
             const Contract = new web3.eth.Contract(abi);
             web3.eth.getAccounts().then(accounts =>{
-                Contract.deploy({data:bytecode,arguments:[title, ballot_id, starttime, endtime, pKE, pKN, candidates]}).send({
-                    from: accounts[0],
-                    gas: 4700000
-                },(err,deploy_res) => {
-                    if(err){
-                        console.log(err);
-                    }
-                    console.log(deploy_res);
-                    Ballot.findOneAndUpdate({id:ballot_id},{is_deployed:true},{useFindAndModify: false},(err,result)=>{
+                Contract.deploy({data:bytecode,arguments:[title, ballot_id, starttime, endtime, pKE, pKN, candidates]})
+                .send({
+                        from: accounts[0],
+                        gas: 4700000
+                    },(err,deploy_res) => {
+                        if(err){
+                            console.log(err);
+                        }
+                        console.log(deploy_res);
+                        Ballot.findOneAndUpdate({id:ballot_id},{is_deployed:true},{useFindAndModify: false},(err,result)=>{
                         if(err){
                             console.log(err);
                         }
                         res.json({success:true,
                             message:"Ballot Successfully Deployed"});
                     })
+                })
+                .then(function(newContractInstance){
+                    console.log(newContractInstance.options.address)
                 })
             })
         }

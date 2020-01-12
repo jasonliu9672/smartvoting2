@@ -6,20 +6,23 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="container">
+            <div class="container mr-0">
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Account Status
-                        </a>
-                        <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
-                        <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Account Status
+                            </a>
+                            <!-- Here's the magic. Add the .animate and .slide-in classes to your .dropdown-menu and you're all set! -->
+                            <div class="dropdown-menu dropdown-menu-right animate slideIn" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>
+                        <li class="nav-item ml-4" >
+                            <a class="nav-link" href="#" @click="signout">Sign out</a>
                         </li>
                     </ul>
                 </div>
@@ -27,39 +30,36 @@
         </nav>
         <table id="ballot-table" class="table mt-4 table-striped table-hover ml-1">
             <thead class="thead-light text-center" style="text-transform:uppercase">
+                <th width=6% >id</th>
                 <th width=11% >title</th>
                 <th width=15% >candidates</th>
-                <th width=11% >district</th>
+                <th width=5% >district</th>
                 <th width=11% >start time</th>
                 <th width=11% >end time</th>
                 <th width=5% >key</th>
                 <th width=15% >description</th>
-                <th width=5% >status</th>
-                <th></th>
+                <th >action</th>
             </thead>
-            <tbody class="text-center">
+            <tbody>
                 <tr v-for="(ballot) in ballots" :key="ballot.id" class="bg-white">
+                    <td class="bg-white text-center align-middle">{{ballot.id}}</td>
                     <td class="bg-white text-center align-middle">{{ballot.title}}</td>
-                    <td>{{ballot.candidates}}</td>
-                    <td>{{ballot.districts}}</td>
-                    <td>
+                    <td class="align-middle">{{ballot.candidates}}</td>
+                    <td class="align-middle">{{ballot.districts}}</td>
+                    <td class="align-middle">
                         {{ballot.starttime}}
                     </td>
-                    <td>
+                    <td class="align-middle"> 
                         {{ballot.endtime}}
                     </td>
-                    <td>
+                    <td class="align-middle">
                        <font-awesome-icon icon="key" class="key-hover text-warning" size="lg" @click="openKeyModal(ballot)"/>
                     </td>
                     <td>
                         {{ballot.description}}
                     </td>
-                    <td>
-                        <span v-if="ballot.is_deployed" class="text-success">deployed</span>
-                        <span v-else><button class="btn btn-success">deploy</button></span>
-                    </td>
-                    <td>
-                        <button class="btn btn-outline-primary btn-sm">vote</button>
+                    <td class="align-middle text-center">
+                        <button class="btn btn-primary btn" @click="openVoteModal(ballot)">vote</button>
                     </td>
                 </tr>
             </tbody>
@@ -106,18 +106,62 @@
                 </div>
             </div>
         </div>
+        <div class="modal" id="VoteModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vote for {{tempVote.title}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Candidates:</p>
+                    <div class="form-check-inline" v-for="candidate in tempVote.candidates" :key="candidate">
+                        <label class="form-check-label">
+                            <input :disabled="voteState !== 1" type="radio" class="form-check-input" name="optradio" :value="candidate" v-model="tempVoteString">{{candidate}}
+                        </label>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label for="exampleFormControlTextarea2">Vote String:</label>
+                        <textarea disabled class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" v-model="tempVoteString"></textarea>
+                    </div>
+                    <div class="d-flex flex-row justify-content-around">
+                        <button v-if="voteState == 4" type="button" class="btn btn-danger">Vote</button>
+                        <button v-else-if="voteState == 3" type="button" class="btn btn-warning" @click="unblindVote(tempVote)">Unblind</button>
+                        <div v-else-if="voteState < 3">
+                            <button :disabled="voteState !== 1" type="button" class="btn btn-info" @click="blindVote(tempVote)">Blind Vote</button>
+                            <button :disabled="voteState !== 2" type="button" class="btn btn-info ml-5" @click="getSign">Get Sign</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import $ from 'jquery'
+const sha256 = require('js-sha256')
+const BigInteger = require('jsbn').BigInteger;
 export default {
     data(){
         return{
             ballots: [],
+            //save list of ballot id and its N
+            // ballot_IN_list:[],
             pagination: {},
             tempBallot: {},
             currentKey:{},
+            tempVote:{},
+            tempVoteString:"",
+            tempMessage:"",
+            voteState: 1, //0 is candidate select, 1 is blinded, 2 is signed , 3 is unblinded
             isNew: false,
             isLoading: false,
         };
@@ -128,10 +172,18 @@ export default {
             const vm = this;
             vm.isLoading = true;
             this.$http.get(api).then((response)=>{
-            console.log(response.data);
-            vm.isLoading = false;
-            vm.ballots=response.data.ballots;
-            vm.pagination = response.data.pagination;
+                console.log(response.data);
+                vm.isLoading = false;
+                vm.ballots=response.data.ballots;
+                vm.pagination = response.data.pagination;
+                const ballot_IN_list = []
+                vm.ballots.forEach(ballot =>{
+                    ballot_IN_list.push({
+                        id: ballot.id,
+                        N: ballot.key.N
+                    })
+                })
+                this.$store.dispatch('generateSecret',ballot_IN_list)
             })
         },
         openModal(isNew, ballot){
@@ -149,6 +201,74 @@ export default {
             const vm=this;
             $('#KeyModal').modal('show');
             vm.currentKey = Object.assign({},ballot.key);
+        },
+        openVoteModal(ballot){
+            const vm=this; 
+            $('#VoteModal').modal('show');
+             vm.tempVote = Object.assign({},ballot);
+             vm.voteState = 1;
+             vm.tempVoteString = "";
+        },
+        blindVote(ballot){
+            let message = this.tempVoteString;
+            if(message && typeof(message) === 'string'){
+                this.tempMessage = message;
+                const messageHash = sha256(message);
+                let messageInt = new BigInteger(messageHash, 16);
+                //store messageInt for verify test
+                // this.tempMessageInt = messageInt;
+                let ballot_id = ballot.id;
+                let E = new BigInteger(ballot.key.E);
+                let N = new BigInteger(ballot.key.N);
+                let r = new BigInteger(localStorage.getItem(ballot_id));
+                let blinded = messageInt.multiply(r.modPow(E,N)).mod(N);
+                this.tempVoteString = blinded.toString();
+                this.voteState = 2;
+            }
+        },
+        //retrieve sign message from server
+        getSign(){
+            let id = this.tempVote.id;
+            const api = `${process.env.APIPATH}/voter/sign/${id}`;
+            const vm = this;
+            let voteChoice = vm.tempVoteString;
+            console.log(voteChoice)
+            this.$http.post(api,{vote_string:voteChoice}).then((response)=>{
+                console.log(response.data)
+                if(response.data.success){
+                    vm.tempVoteString = response.data.signed_message
+                    vm.voteState = 3
+                }
+            })
+        },
+        unblindVote(ballot){
+            const vm = this;
+            let ballot_id = ballot.id;
+            let r = new BigInteger(localStorage.getItem(ballot_id));
+            let N = new BigInteger(ballot.key.N);
+            let signed = new BigInteger(vm.tempVoteString)
+            const unblinded = signed.multiply(r.modInverse(N)).mod(N);
+            vm.tempVoteString = unblinded.toString();
+            vm.voteState = 4;
+            // vm.verify(ballot,unblinded);
+        },
+        vote(){
+            //use tempVoteString (unblind signed message) and  tempMessage ("TIW63731") to vote onto blockchain
+        },
+        // verify(ballot,unblinded){
+        //     const vm = this;
+        //     const messageHash = vm.tempMessageInt;
+        //     let unblind_message = unblinded
+        //     let N = new BigInteger(ballot.key.N);
+        //     let D = new BigInteger(ballot.key.D);
+        //     const msgSig = messageHash.modPow(D, N);
+        //     const result = unblind_message.equals(msgSig);
+        //     console.log(result)
+        // },
+        signout(){
+            const vm = this;
+            this.$store.dispatch('logout');
+            vm.$router.push('/login');
         },
     },
     created(){
@@ -213,10 +333,10 @@ export default {
 
 /* Other styles for the page not related to the animated dropdown */
 
-body {
-  background: #007bff;
-  background: linear-gradient(to right, #0062E6, #33AEFF);
-}
+// body {
+//   background: #007bff;
+//   background: linear-gradient(to right, #0062E6, #33AEFF);
+// }
 .navbar-brand{
     background: #f8f9fa;
 }

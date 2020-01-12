@@ -1,4 +1,5 @@
 var express = require('express');
+const BigInteger = require('jsbn').BigInteger;
 var Ballot = require('../models/ballot');
 var router = express.Router();
 router.get('/ballots',(req,res) =>{
@@ -36,6 +37,25 @@ router.get('/ballots',(req,res) =>{
                 )
             }
         });
+    })
+})
+router.post('/sign/:id',(req,res) =>{
+    var ballot_id = req.params.id;
+    var vote_string = req.body.vote_string;
+    console.log(vote_string)
+    Ballot.findOne({id: ballot_id},function(err,ballot){
+        if(err){
+            console.log(err);
+            res.json({success:false,
+                message:"Something wrong while querying db"});
+        }
+        let N = new BigInteger(ballot.key.N);
+        let D = new BigInteger(ballot.key.D);
+        vote = new BigInteger(vote_string);
+        console.log(vote)
+        const signed = vote.modPow(D,N).toString()
+        res.json({success:true,
+            signed_message:signed});
     })
 })
 module.exports = router;

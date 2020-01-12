@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
-
+const secureRandom = require('secure-random');
+const BigInteger = require('jsbn').BigInteger;
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -9,7 +10,14 @@ export default new Vuex.Store({
     state:{
         status:'',
         token:localStorage.getItem('token') || '',
+        //for unblinding
+        ballot_id_list:[]
         //user:{}
+    },
+    getters:{
+        getBallotIdlist: state =>{
+            return state.ballot_id_list
+        }
     },
     mutations:{
         auth_request(state){
@@ -27,7 +35,14 @@ export default new Vuex.Store({
         },
         logout(state){
             state.status = ''
-            state.status = ''
+        },
+        addBallot(state, ballot_id){
+            state.ballot_id_list.push(ballot_id)
+        },
+        removeBallot(state,ballot_id){
+            state.ballot_id_list = state.ballot_id_list.filter( ballot =>{
+                ballot != ballot_id
+            })
         }
     },
     actions:{
@@ -83,7 +98,33 @@ export default new Vuex.Store({
                 delete axios.defaults.headers.common['Authorization']
                 resolve()
             })
-        }
+        },
+        generateSecret({commit,getters},ballot_list){
+            return new Promise((resolve, reject)=>{
+                const bigOne = new BigInteger('1');
+                console.log(ballot_list)
+                ballot_list.forEach((ballot) =>{
+                    let new_ballot_id = ballot.id
+                    if(localStorage.getItem(new_ballot_id.toString()) === null){
+                        let gcd;
+                        let r;
+                        let N = new BigInteger(ballot.N);
+                        do {
+                            r = new BigInteger(secureRandom(64)).mod(N);
+                            gcd = r.gcd(N);
+                        } while (
+                            !gcd.equals(bigOne) ||
+                            r.compareTo(N) >= 0 ||
+                            r.compareTo(bigOne) <= 0
+                        );
+                        console.log(new_ballot_id)
+                        localStorage.setItem(new_ballot_id,r)
+                        commit('addBallot', {new_ballot_id})
+                    }
+                })
+                resolve()
+             })
+        }    
     },
     getters:{
         isLoggedIn: state => !!state.token,

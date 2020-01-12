@@ -15,9 +15,22 @@ const input = fs.readFileSync(path.resolve(__dirname,'../../../Vote/contracts/Vo
 const output = solc.compile(input.toString());
 const bytecode = output.contracts[':'+'Voting'].bytecode;
 const abi = JSON.parse(output.contracts[':'+'Voting'].interface);
+const Contract = new web3.eth.Contract(abi);
+router.get('/addresslist', (req,res)=>{
+    web3.eth.getAccounts().then(addresses =>{
+        res.json({success:true,
+            addresses: addresses});
+    })
+})
+router.post('/vote',(req,res)=>{
+    var message = req.body.message;
+    var signed_message = req.body.signed_message;
+    var send_address = req.body.send_address;
+    Contract.methods.verify([message,signed_message]).send({from: send_address}, function(error, result){
+        console.log(result)
+    });
 
-/*
-
+}) 
 router.get('/deploy/:id', async (req, res) => {
     var ballot_id = req.params.id;
     console.log(ballot_id)
@@ -35,9 +48,9 @@ router.get('/deploy/:id', async (req, res) => {
             var starttime = Date.parse(ballot.starttime);
             var endtime = Date.parse(ballot.endtime);
             var pKE = ballot.key.E;
-            var pKN = web3.utils.toHex(ballot.key.N);
+            //var pKN = web3.utils.toHex(ballot.key.N);
+            var pKN = ballot.key.N;
             var candidates = ballot.candidates;
-            const Contract = new web3.eth.Contract(abi);
             web3.eth.getAccounts().then(accounts =>{
                 Contract.deploy({data:bytecode,arguments:[title, ballot_id, starttime, endtime, pKE, pKN, candidates]})
                 .send({
@@ -63,7 +76,7 @@ router.get('/deploy/:id', async (req, res) => {
         }
     });
 })
-*/
+/*
 const sha256 = require('js-sha256')
 const contractUri = "http://localhost:7545";
 var provider = new Web3.providers.HttpProvider(contractUri);
@@ -96,12 +109,13 @@ router.get('/test', async (req, res) => {
     const result = await voting.verify(msg, signed);
     console.log(result);
 })
-/*
+
 58639812522817345304249820608953445364178878399563037660546123600364729088304
 58639812522817345304249820608953445364178878399563037660546123600364729088304
 81a4f52cd910dfeac9ef08862ef2135c0fd09743aa6d504564d606fdae913930
 48323128154290828385683446030412402444136180340464220963639050973970971035883
-*/
+
+
 router.get('/deploy', async (req, res) => {
     console.log("Deploy");
     const ballot = await Ballot.findOne({title: "Presidential Election"});
@@ -126,11 +140,7 @@ router.get('/deploy', async (req, res) => {
     } catch (err) {
         console.log(err);
     }
-    
-     
-    //console.log(result.logs[0].args.val.toNumber());
-})
-
+*/
 router.post('/',(req,res) =>{
     var title = req.body.data.title;
     var candidates = Object.values(req.body.data.candidates).map(item => item.code);
@@ -146,7 +156,7 @@ router.post('/',(req,res) =>{
         return res.status(422).json({success:false, message:"date is not right"});
     }
     else{
-        var new_key = new NodeRSA({ b: 512 });
+        var new_key = new NodeRSA({ b: 256 });
         Ballot.create({
             title: title,
             candidates: candidates,

@@ -86,14 +86,16 @@ contract Voting {
         }
         return x;
     }
+
     function verify (string memory message, string memory signedMessage) public returns (bool eligible) {
         msgHash = sha256(bytes(message));
         uint result = modPow(sliceUint(bytes(signedMessage), 0), publicKeyE, uint(publicKeyN));
         verifyHash = bytes32(result);
         if (bytes32(result) == msgHash) eligible = true;
         else eligible = false;
+        return eligible;
     }
-
+    
     function checkTime () private view returns (bool) {
         if (now > endTime || now < startTime) return false;
         else return true;

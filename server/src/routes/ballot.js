@@ -15,7 +15,9 @@ const input = fs.readFileSync(path.resolve(__dirname,'../../../Vote/contracts/Vo
 const output = solc.compile(input.toString());
 const bytecode = output.contracts[':'+'Voting'].bytecode;
 const abi = JSON.parse(output.contracts[':'+'Voting'].interface);
+
 /*
+
 router.get('/deploy/:id', async (req, res) => {
     var ballot_id = req.params.id;
     console.log(ballot_id)
@@ -33,7 +35,7 @@ router.get('/deploy/:id', async (req, res) => {
             var starttime = Date.parse(ballot.starttime);
             var endtime = Date.parse(ballot.endtime);
             var pKE = ballot.key.E;
-            var pKN = ballot.key.N;
+            var pKN = web3.utils.toHex(ballot.key.N);
             var candidates = ballot.candidates;
             const Contract = new web3.eth.Contract(abi);
             web3.eth.getAccounts().then(accounts =>{
@@ -62,19 +64,44 @@ router.get('/deploy/:id', async (req, res) => {
     });
 })
 */
+const sha256 = require('js-sha256')
 const contractUri = "http://localhost:7545";
 var provider = new Web3.providers.HttpProvider(contractUri);
 var contract = require("@truffle/contract");
 //const contract = require('truffle-contract');
 var VotingArtifacts = require("../../../Vote/build/contracts/Voting.json");
-const BigNumber = require('bignumber.js');
+const BigInteger = require('jsbn').BigInteger;
 const Voting = contract(VotingArtifacts);
 Voting.setProvider(provider);
 //Set an account for sending deployed contract
 Voting.defaults({
-   from: "0xE3191cb2e046A74fEd41B5dA577171d04c6F4290"
+   from: "0xFaf62991b8DDD5953F5fDac5ea689C83D9433e36"
 });
 //const voting = Voting.at("0x6b17F32E623c15507E982204A59F97039773b117");
+router.get('/test', async (req, res) => {
+    const ballot = await Ballot.findOne({title: "Presidential Election"});
+    const signedMsg = new BigInteger("48323128154290828385683446030412402444136180340464220963639050973970971035883");
+    const signed = "48323128154290828385683446030412402444136180340464220963639050973970971035883";
+    const msg = "TIW63731";
+    const e = new BigInteger(ballot.key.E);
+    const n = new BigInteger(ballot.key.N);
+    var d = signedMsg.modPow(e,n);
+    console.log(d.toString());
+    msgHash = sha256(msg);
+    let messageInt = new BigInteger(msgHash, 16);
+    console.log(messageInt.toString());
+    console.log(msgHash);
+    console.log(signedMsg.toString());
+    const voting = await Voting.deployed();
+    const result = await voting.verify(msg, signed);
+    console.log(result);
+})
+/*
+58639812522817345304249820608953445364178878399563037660546123600364729088304
+58639812522817345304249820608953445364178878399563037660546123600364729088304
+81a4f52cd910dfeac9ef08862ef2135c0fd09743aa6d504564d606fdae913930
+48323128154290828385683446030412402444136180340464220963639050973970971035883
+*/
 router.get('/deploy', async (req, res) => {
     console.log("Deploy");
     const ballot = await Ballot.findOne({title: "Presidential Election"});
@@ -86,13 +113,14 @@ router.get('/deploy', async (req, res) => {
     const pKN = ballot.key.N;
     const candidates = ballot.candidates;
     const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
-    var value = web3.utils.toBN(ballot.key.N);
+    var value = web3.utils.toHex(ballot.key.N);
     const voting = await Voting.deployed();
     try {
         //await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
-        const result = await voting.getKey.call();
-        console.log(result[0].toNumber());
-        console.log(result[1].eq(value));
+        const result = await voting.getHash.call();
+        console.log(result[0]);
+        console.log(result[1]);
+        //console.log(value);
         //res.json({success:true,
         //    contract_address: voting.options.address});
     } catch (err) {

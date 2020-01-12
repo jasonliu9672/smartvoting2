@@ -19,10 +19,12 @@ contract Voting {
     uint startTime;
     uint endTime;
     uint publicKeyE;
-    uint256 publicKeyN;
+    bytes32 publicKeyN;
     mapping (address => Voter) voters; // eligible voters
     Candidate[] candidates; // eligible candidates
     uint public value = 0;
+    bytes32 msgHash;
+    bytes32 verifyHash;
     event ValueSet(uint val);
     function setValue(uint val) public {
         value += val;
@@ -34,11 +36,14 @@ contract Voting {
     function getTime() public view returns (uint, uint) {
         return (startTime, endTime);
     }
-    function getKey() public view returns (uint, uint) {
+    function getKey() public view returns (uint, bytes32) {
         return (publicKeyE, publicKeyN);
     }
+    function getHash() public view returns(bytes32, bytes32){
+        return (msgHash, verifyHash);
+    }
 
-    constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, uint256 N, string[] memory _can) public {
+    constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, bytes32 N, string[] memory _can) public {
         votingTitle = _vT;
         votingID = _vID;
         startTime = _sT;
@@ -65,8 +70,13 @@ contract Voting {
 
     }
 
-    function verify (string memory message, string memory signedMessage) private returns (bool eligible) {
-        eligible = true;
+    function verify (string memory message, string memory signedMessage) public returns (bool eligible) {
+        msgHash = sha256(message);
+        //rsaverify(msgHash, publicKeyN, publicKeyE, );
+        uint result = mulmod(uint(msgHash), publicKeyE, uint(publicKeyN));
+        verifyHash = bytes32(result);
+        if (bytes32(result) == msgHash) eligible = true;
+        else eligible = false;
     }
 
     function checkTime () private view returns (bool) {
@@ -76,11 +86,6 @@ contract Voting {
 
     function checkVotingID (uint ballotID) private view returns (bool) {
         if (ballotID != votingID) return false;
-        else return true;
-    }
-
-    function checkVoter (address _voterAddr) private view returns (bool) {
-        if (voters[_voterAddr].id == 0) return false;
         else return true;
     }
 

@@ -15,9 +15,22 @@ const input = fs.readFileSync(path.resolve(__dirname,'../../../Vote/contracts/Vo
 const output = solc.compile(input.toString());
 const bytecode = output.contracts[':'+'Voting'].bytecode;
 const abi = JSON.parse(output.contracts[':'+'Voting'].interface);
+const Contract = new web3.eth.Contract(abi);
+router.get('/addresslist', (req,res)=>{
+    web3.eth.getAccounts().then(addresses =>{
+        res.json({success:true,
+            addresses: addresses});
+    })
+})
+router.post('/vote',(req,res)=>{
+    var message = req.body.message;
+    var signed_message = req.body.signed_message;
+    var send_address = req.body.send_address;
+    Contract.methods.verify([message,signed_message]).send({from: send_address}, function(error, result){
+        console.log(result)
+    });
 
-/*
-
+}) 
 router.get('/deploy/:id', async (req, res) => {
     var ballot_id = req.params.id;
     console.log(ballot_id)
@@ -35,9 +48,9 @@ router.get('/deploy/:id', async (req, res) => {
             var starttime = Date.parse(ballot.starttime);
             var endtime = Date.parse(ballot.endtime);
             var pKE = ballot.key.E;
-            var pKN = web3.utils.toHex(ballot.key.N);
+            //var pKN = web3.utils.toHex(ballot.key.N);
+            var pKN = ballot.key.N;
             var candidates = ballot.candidates;
-            const Contract = new web3.eth.Contract(abi);
             web3.eth.getAccounts().then(accounts =>{
                 Contract.deploy({data:bytecode,arguments:[title, ballot_id, starttime, endtime, pKE, pKN, candidates]})
                 .send({
@@ -63,7 +76,7 @@ router.get('/deploy/:id', async (req, res) => {
         }
     });
 })
-*/
+/*
 const sha256 = require('js-sha256')
 const contractUri = "http://localhost:7545";
 var provider = new Web3.providers.HttpProvider(contractUri);
@@ -102,34 +115,34 @@ router.get('/test', async (req, res) => {
 81a4f52cd910dfeac9ef08862ef2135c0fd09743aa6d504564d606fdae913930
 48323128154290828385683446030412402444136180340464220963639050973970971035883
 */
-router.get('/deploy', async (req, res) => {
-    console.log("Deploy");
-    const ballot = await Ballot.findOne({title: "Presidential Election"});
-    const title = ballot.title;
-    const id = 123;
-    const starttime = Date.parse(ballot.starttime);
-    const endtime = Date.parse(ballot.endtime);
-    const pKE = ballot.key.E;
-    const pKN = ballot.key.N;
-    const candidates = ballot.candidates;
-    const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
-    var value = web3.utils.toHex(ballot.key.N);
-    const voting = await Voting.deployed();
-    try {
-        //await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
-        const result = await voting.getHash.call();
-        console.log(result[0]);
-        console.log(result[1]);
-        //console.log(value);
-        //res.json({success:true,
-        //    contract_address: voting.options.address});
-    } catch (err) {
-        console.log(err);
-    }
+// router.get('/deploy', async (req, res) => {
+//     console.log("Deploy");
+//     const ballot = await Ballot.findOne({title: "Presidential Election"});
+//     const title = ballot.title;
+//     const id = 123;
+//     const starttime = Date.parse(ballot.starttime);
+//     const endtime = Date.parse(ballot.endtime);
+//     const pKE = ballot.key.E;
+//     const pKN = ballot.key.N;
+//     const candidates = ballot.candidates;
+//     const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
+//     var value = web3.utils.toHex(ballot.key.N);
+//     const voting = await Voting.deployed();
+//     try {
+//         //await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
+//         const result = await voting.getHash.call();
+//         console.log(result[0]);
+//         console.log(result[1]);
+//         //console.log(value);
+//         //res.json({success:true,
+//         //    contract_address: voting.options.address});
+//     } catch (err) {
+//         console.log(err);
+//     }
     
      
-    //console.log(result.logs[0].args.val.toNumber());
-})
+//     //console.log(result.logs[0].args.val.toNumber());
+// })
 
 router.post('/',(req,res) =>{
     var title = req.body.data.title;
@@ -146,7 +159,7 @@ router.post('/',(req,res) =>{
         return res.status(422).json({success:false, message:"date is not right"});
     }
     else{
-        var new_key = new NodeRSA({ b: 512 });
+        var new_key = new NodeRSA({ b: 256 });
         Ballot.create({
             title: title,
             candidates: candidates,

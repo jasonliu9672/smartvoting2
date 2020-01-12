@@ -2,12 +2,6 @@ pragma solidity >=0.4.25;
 pragma experimental ABIEncoderV2;
 
 contract Voting {
-    struct Voter {
-        uint id; // voter's id
-        bool voted; // whether the voter has voted or not
-        uint candidate; // the candidate that the voter votes for
-    }
-
     struct Candidate {
         uint count;
         string name;
@@ -20,7 +14,6 @@ contract Voting {
     uint endTime;
     uint publicKeyE;
     bytes32 publicKeyN;
-    mapping (address => Voter) voters; // eligible voters
     Candidate[] candidates; // eligible candidates
     uint public value = 0;
     bytes32 msgHash;
@@ -60,16 +53,6 @@ contract Voting {
         owner = msg.sender;
     }
 
-    function vote (uint candidate) public {
-        Voter storage sender = voters[msg.sender];
-        //require(verify(), "Signature is wrong.");
-        //require(!sender.voted, "Sender has been voted.");
-        //sender.voted = true;
-        //sender.candidate = candidate;
-        candidates[candidate].count += 1;
-
-    }
-
     function verify (string memory message, string memory signedMessage) public returns (bool eligible) {
         msgHash = sha256(message);
         //rsaverify(msgHash, publicKeyN, publicKeyE, );
@@ -77,8 +60,45 @@ contract Voting {
         verifyHash = bytes32(result);
         if (bytes32(result) == msgHash) eligible = true;
         else eligible = false;
+        return eligible;
     }
-
+    // function uintToAscii(uint number) public view returns(byte) {
+    // if (number < 10) {
+    //     return byte(48 + number);
+    // } else if (number < 16) {
+    //     return byte(87 + number);
+    // } else {
+    //     revert();
+    // }
+    // }
+    // function asciiToUint(byte char) public view returns (uint) {
+    //     uint asciiNum = uint(char);
+    //     if (asciiNum > 47 && asciiNum < 58) {
+    //         return asciiNum - 48;
+    //     } else if (asciiNum > 96 && asciiNum < 103) {
+    //         return asciiNum - 87;
+    //     } else {
+    //         revert();
+    //     }
+    // }
+    // function bytes32ToString (bytes32 data) public view returns (string memory) {
+    //     bytes memory bytesString = new bytes(64);
+    //     for (uint j = 0; j < 32; j++) {
+    //         byte char = byte(bytes32(uint(data) * 2 ** (8 * j)));
+    //         bytesString[j*2+0] = uintToAscii(uint(char) / 16);
+    //         bytesString[j*2+1] = uintToAscii(uint(char) % 16);
+    //     }
+    //         return string(bytesString);
+    // }
+    // function stringToBytes32(string memory str) public view returns (bytes32) {
+    //     bytes memory bString = bytes(str);
+    //     uint uintString;
+    //     if (bString.length != 64) { revert(); }
+    //     for (uint i = 0; i < 64; i++) {
+    //         uintString = uintString*16 + uint(asciiToUint(bString[i]));
+    //     }
+    //     return bytes32(uintString);
+    // }
     function checkTime () private view returns (bool) {
         if (now > endTime || now < startTime) return false;
         else return true;

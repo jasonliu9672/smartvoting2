@@ -16,6 +16,7 @@ const output = solc.compile(input.toString());
 const bytecode = output.contracts[':'+'Voting'].bytecode;
 const abi = JSON.parse(output.contracts[':'+'Voting'].interface);
 const Contract = new web3.eth.Contract(abi);
+
 router.get('/addresslist', (req,res)=>{
     web3.eth.getAccounts().then(addresses =>{
         res.json({success:true,
@@ -24,7 +25,7 @@ router.get('/addresslist', (req,res)=>{
 })
 router.post('/vote',(req,res)=>{
     var message = req.body.message;
-    var signed_message = req.body.signed_message;
+    var signed_message = web3.utils.toHex(req.body.signed_message);
     var send_address = req.body.send_address;
     Contract.methods.verify([message,signed_message]).send({from: send_address}, function(error, result){
         console.log(result)
@@ -48,8 +49,8 @@ router.get('/deploy/:id', async (req, res) => {
             var starttime = Date.parse(ballot.starttime);
             var endtime = Date.parse(ballot.endtime);
             var pKE = ballot.key.E;
-            //var pKN = web3.utils.toHex(ballot.key.N);
-            var pKN = ballot.key.N;
+            var pKN = web3.utils.toHex(ballot.key.N);
+            //var pKN = ballot.key.N;
             var candidates = ballot.candidates;
             web3.eth.getAccounts().then(accounts =>{
                 Contract.deploy({data:bytecode,arguments:[title, ballot_id, starttime, endtime, pKE, pKN, candidates]})
@@ -76,71 +77,7 @@ router.get('/deploy/:id', async (req, res) => {
         }
     });
 })
-/*
-const sha256 = require('js-sha256')
-const contractUri = "http://localhost:7545";
-var provider = new Web3.providers.HttpProvider(contractUri);
-var contract = require("@truffle/contract");
-//const contract = require('truffle-contract');
-var VotingArtifacts = require("../../../Vote/build/contracts/Voting.json");
-const BigInteger = require('jsbn').BigInteger;
-const Voting = contract(VotingArtifacts);
-Voting.setProvider(provider);
-//Set an account for sending deployed contract
-Voting.defaults({
-   from: "0xFaf62991b8DDD5953F5fDac5ea689C83D9433e36"
-});
-//const voting = Voting.at("0x6b17F32E623c15507E982204A59F97039773b117");
-router.get('/test', async (req, res) => {
-    const ballot = await Ballot.findOne({title: "Presidential Election"});
-    const signedMsg = new BigInteger("48323128154290828385683446030412402444136180340464220963639050973970971035883");
-    const signed = "48323128154290828385683446030412402444136180340464220963639050973970971035883";
-    const msg = "TIW63731";
-    const e = new BigInteger(ballot.key.E);
-    const n = new BigInteger(ballot.key.N);
-    var d = signedMsg.modPow(e,n);
-    console.log("d:" + d.toString());
-    msgHash = sha256(msg);
-    let messageInt = new BigInteger(msgHash, 16);
-    console.log(n.toString());
-    console.log(msgHash.toString());
-    console.log(signedMsg.toString());
-    const voting = await Voting.deployed();
-    const result = await voting.verify(msg, signed);
-    console.log(result);
-})
 
-58639812522817345304249820608953445364178878399563037660546123600364729088304
-58639812522817345304249820608953445364178878399563037660546123600364729088304
-81a4f52cd910dfeac9ef08862ef2135c0fd09743aa6d504564d606fdae913930
-48323128154290828385683446030412402444136180340464220963639050973970971035883
-
-
-router.get('/deploy', async (req, res) => {
-    console.log("Deploy");
-    const ballot = await Ballot.findOne({title: "Presidential Election"});
-    const title = ballot.title;
-    const id = 123;
-    const starttime = Date.parse(ballot.starttime);
-    const endtime = Date.parse(ballot.endtime);
-    const pKE = ballot.key.E;
-    const pKN = ballot.key.N;
-    const candidates = ballot.candidates;
-    const voters = ['0xB70b10C39DC9Bf0F1A1A6729D1E7b736c40bf82f', '0x225970CEcF9f0cBaFD30805c83ee44FDAefeDE12'];
-    var value = web3.utils.toHex(ballot.key.N);
-    const voting = await Voting.deployed();
-    try {
-        //await voting.create(title, id, starttime, endtime, pKE, pKN, voters, candidates);
-        const result = await voting.getHash.call();
-        console.log(result[0].toString());
-        console.log(result[1].toString());
-        //console.log(value);
-        //res.json({success:true,
-        //    contract_address: voting.options.address});
-    } catch (err) {
-        console.log(err);
-    }
-*/
 router.post('/',(req,res) =>{
     var title = req.body.data.title;
     var candidates = Object.values(req.body.data.candidates).map(item => item.code);

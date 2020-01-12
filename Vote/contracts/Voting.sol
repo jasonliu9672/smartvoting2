@@ -38,9 +38,9 @@ contract Voting {
     function getHash() public view returns(bytes32, bytes32){
         return (msgHash, verifyHash);
     }
-    //function getTest() public view returns (uint, uint) {
-    //    return (testString, testmsg);
-    //}
+    function getTest() public view returns (uint, uint) {
+        return (testString, testmsg);
+    }
 
     constructor (string memory _vT, uint _vID, uint _sT, uint _eT, uint E, bytes32 N, string[] memory _can) public {
         votingTitle = _vT;
@@ -59,13 +59,14 @@ contract Voting {
         owner = msg.sender;
     }
 
-    function vote (uint candidate) public {
-        //require(verify(), "Signature is wrong.");
-        //require(!sender.voted, "Sender has been voted.");
-        //sender.voted = true;
-        //sender.candidate = candidate;
-        candidates[candidate].count += 1;
-
+    function vote (string memory message, bytes memory signedMessage) public {
+        if (verify(message, signedMessage)){
+            for (uint i = 0; i < candidates.length; i++) {
+                if (keccak256(abi.encodePacked((message))) == keccak256(abi.encodePacked((candidates[i].name)))) {
+                    candidates[i].count += 1;
+                }
+            }
+        }
     }
     
     function modPow(uint _base, uint _exponent, uint _modulus) public pure returns(uint) {
@@ -79,7 +80,6 @@ contract Voting {
         return result;
     }
     function sliceUint(bytes memory bs, uint start) internal pure returns (uint) {
-        require(bs.length >= start + 32, "slicing out of range");
         uint x;
         assembly {
             x := mload(add(bs, add(0x20, start)))
@@ -87,9 +87,9 @@ contract Voting {
         return x;
     }
 
-    function verify (string memory message, string memory signedMessage) public returns (bool eligible) {
+    function verify (string memory message, bytes memory signedMessage) public returns (bool eligible) {
         msgHash = sha256(bytes(message));
-        uint result = modPow(sliceUint(bytes(signedMessage), 0), publicKeyE, uint(publicKeyN));
+        uint result = modPow(sliceUint(signedMessage,0), publicKeyE, uint(publicKeyN));
         verifyHash = bytes32(result);
         if (bytes32(result) == msgHash) eligible = true;
         else eligible = false;

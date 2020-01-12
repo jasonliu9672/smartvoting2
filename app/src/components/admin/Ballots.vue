@@ -42,7 +42,7 @@
                             <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">Edit</button>
                             <button class="btn btn-outline-danger btn-sm" @click="openDelBallotModal(ballot)">Delete</button>
                         </template>
-                        <button v-else class="btn btn-outline-danger btn-sm">Collect Vote</button>
+                        <button v-else class="btn btn-outline-danger btn-sm" @click="collectVote(ballot)">Collect Vote</button>
                     </td>
                 </tr>
             </tbody>
@@ -315,6 +315,14 @@ export default {
                 }
             })
         },
+        collectVote(ballot){
+            let id = ballot.id;
+            const api = `${process.env.APIPATH}/ballots/collectvote/${id}`;
+            const vm = this;
+            vm.$http.get(api).then((response)=>{
+                
+            })
+        }
     },
     computed:{
         tempTime: function(){

@@ -60,7 +60,7 @@ contract Voting {
     }
 
     function vote (string memory message, bytes memory signedMessage) public {
-        if (verify(message, signedMessage)){
+        if (verify(message, signedMessage) && checkTime()){
             for (uint i = 0; i < candidates.length; i++) {
                 if (keccak256(abi.encodePacked((message))) == keccak256(abi.encodePacked((candidates[i].name)))) {
                     candidates[i].count += 1;

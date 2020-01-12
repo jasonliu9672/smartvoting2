@@ -8,9 +8,7 @@ var Web3 = require('web3');
 const path = require("path");
 const fs = require('fs');
 const solc = require('solc');
-const ganache_cli = "http://localhost:7545";
 const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
-//compile voting.sol
 const input = fs.readFileSync(path.resolve(__dirname,'../../../Vote/contracts/Voting.sol'),'utf8');
 const output = solc.compile(input.toString());
 const bytecode = output.contracts[':'+'Voting'].bytecode;
@@ -23,13 +21,33 @@ router.get('/addresslist', (req,res)=>{
             addresses: addresses});
     })
 })
-router.post('/vote',(req,res)=>{
+router.post('/vote/:id',(req,res)=>{
+    var ballot_id = req.params.id;
     var message = req.body.message;
     var signed_message = web3.utils.toHex(req.body.signed_message);
     var send_address = req.body.send_address;
-    Contract.methods.verify([message,signed_message]).send({from: send_address}, function(error, result){
-        console.log(result)
-    });
+    Ballot.findOne({id: ballot_id},function(err,ballot){
+        Contract.options.address = ballot.contract_address
+        console.log(ballot.contract_address,send_address)
+        Contract.methods.verify(message,signed_message).send({from: send_address}, function(error, result){
+            res.json({success:true,
+                message:"vote success!"});
+            console.log(result)
+        });
+    })
+
+}) 
+router.get('/collectvote/:id',(req,res)=>{
+    var ballot_id = req.params.id;
+    Ballot.findOne({id: ballot_id},function(err,ballot){
+        Contract.options.address = ballot.contract_address
+        console.log(ballot.contract_address)
+        web3.eth.getAccounts().then(accounts =>{
+            Contract.methods.collectVotes().call({from: accounts[0]}, function(error, result){
+                console.log(result)
+            });
+        })
+    })
 
 }) 
 router.get('/deploy/:id', async (req, res) => {
@@ -61,7 +79,6 @@ router.get('/deploy/:id', async (req, res) => {
                         if(err){
                             console.log(err);
                         }
-                        console.log(deploy_res);
                         Ballot.findOneAndUpdate({id:ballot_id},{is_deployed:true},{useFindAndModify: false},(err,result)=>{
                         if(err){
                             console.log(err);
@@ -71,7 +88,9 @@ router.get('/deploy/:id', async (req, res) => {
                     })
                 })
                 .then(function(newContractInstance){
-                    console.log(newContractInstance.options.address)
+                    Ballot.findOneAndUpdate({id:ballot_id},{contract_address:newContractInstance.options.address},{useFindAndModify: false},(err,result)=>{
+                        console.log(newContractInstance.options.address)
+                    })
                 })
             })
         }
@@ -85,8 +104,6 @@ router.post('/',(req,res) =>{
     var starttime = req.body.data.starttime;
     var endtime = req.body.data.endtime;
     var description = req.body.data.description;
-    // console.log(new Date(starttime));
-    // console.log(typeof(starttime));
     console.log(Date.parse(starttime),Date.parse(endtime),Date.now());
     if( Date.parse(starttime) < Date.now() && Date.parse(endtime) < Date.now() && Date.parse(starttime) >= Date.parse(endtime) ){
         console.log("date is not right")
@@ -104,7 +121,8 @@ router.post('/',(req,res) =>{
             key: {E: new_key.keyPair.e.toString(),
                   N: new_key.keyPair.n.toString(),
                   D: new_key.keyPair.d.toString()},
-            is_deployed: false
+            is_deployed: false,
+            contract_address: ""
         }, function(err){
             if (err){
                 res.json({success:false,

@@ -68,7 +68,6 @@ contract Voting {
             }
         }
     }
-    
     function modPow(uint _base, uint _exponent, uint _modulus) public pure returns(uint) {
         uint result;
         result = 1;
@@ -95,7 +94,6 @@ contract Voting {
         else eligible = false;
         return eligible;
     }
-    
     function checkTime () private view returns (bool) {
         if (now > endTime || now < startTime) return false;
         else return true;
@@ -115,5 +113,6 @@ contract Voting {
                 winningCandidates = candidates[i].name;
             }
         }
+        return winningCandidates;
     }
 }

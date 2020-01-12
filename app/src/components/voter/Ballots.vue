@@ -128,7 +128,13 @@
                         <textarea disabled class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" v-model="tempVoteString"></textarea>
                     </div>
                     <div class="d-flex flex-row justify-content-around">
-                        <button v-if="voteState == 4" type="button" class="btn btn-danger">Vote</button>
+                        <div v-if="voteState == 4" class="text-center" >
+                            <div class="form-group">
+                                <label for="AddressSelect">Select Vote Address</label>
+                                <multiselect id="AddressSelect" v-model="selectAddress" :options="addressList" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Pick an address"></multiselect>
+                            </div>
+                            <button type="button" class="btn btn-danger" @click="vote()">Vote</button>
+                        </div>
                         <button v-else-if="voteState == 3" type="button" class="btn btn-warning" @click="unblindVote(tempVote)">Unblind</button>
                         <div v-else-if="voteState < 3">
                             <button :disabled="voteState !== 1" type="button" class="btn btn-info" @click="blindVote(tempVote)">Blind Vote</button>
@@ -147,12 +153,15 @@
 
 <script>
 import $ from 'jquery'
+import Multiselect from 'vue-multiselect'
 const sha256 = require('js-sha256')
 const BigInteger = require('jsbn').BigInteger;
 export default {
     data(){
         return{
             ballots: [],
+            addressList: [],
+            selectAddress:"",
             //save list of ballot id and its N
             // ballot_IN_list:[],
             pagination: {},
@@ -165,6 +174,9 @@ export default {
             isNew: false,
             isLoading: false,
         };
+    },
+     components: {
+        Multiselect
     },
     methods:{
         getBallots(page = 1){
@@ -184,6 +196,14 @@ export default {
                     })
                 })
                 this.$store.dispatch('generateSecret',ballot_IN_list)
+            })
+        },
+        getAddressList(){
+            const api = `${process.env.APIPATH}/ballots/addresslist`;
+            const vm = this;
+            vm.$http.get(api).then((response)=>{
+                vm.addressList = response.data.addresses
+                console.log(response.data.addresses)
             })
         },
         openModal(isNew, ballot){
@@ -208,6 +228,7 @@ export default {
              vm.tempVote = Object.assign({},ballot);
              vm.voteState = 1;
              vm.tempVoteString = "";
+             vm.selectAddress = "";
         },
         blindVote(ballot){
             let message = this.tempVoteString;
@@ -253,7 +274,18 @@ export default {
             // vm.verify(ballot,unblinded);
         },
         vote(){
-            //use tempVoteString (unblind signed message) and  tempMessage ("TIW63731") to vote onto blockchain
+            let id = this.tempVote.id;
+            const api = `${process.env.APIPATH}/ballots/vote/${id}`;
+            const vm = this;
+            let signed_message = vm.tempVoteString;
+            let message = vm.tempMessage
+            let send_address = vm.selectAddress;
+            vm.$http.post(api,{signed_message:signed_message,message:message,send_address:send_address}).then((response)=>{
+                if(response.data.success){
+                     this.$bus.$emit('message:push','vote!','success');
+                }
+            })
+            
         },
         // verify(ballot,unblinded){
         //     const vm = this;
@@ -273,6 +305,7 @@ export default {
     },
     created(){
         this.getBallots();
+        this.getAddressList();
     }
 }
 </script>

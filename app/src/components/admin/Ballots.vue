@@ -42,7 +42,7 @@
                             <button class="btn btn-outline-primary btn-sm" @click="openModal(false, ballot)">Edit</button>
                             <button class="btn btn-outline-danger btn-sm" @click="openDelBallotModal(ballot)">Delete</button>
                         </template>
-                        <button v-else class="btn btn-outline-danger btn-sm">Collect Vote</button>
+                        <button v-else class="btn btn-outline-danger btn-sm" @click="collectVote(ballot)">Collect Vote</button>
                     </td>
                 </tr>
             </tbody>
@@ -235,6 +235,7 @@ export default {
             const api = `${process.env.APIPATH}/ballots/deploy/${id}`;
             this.$http.get(api).then(() => {
                 this.getBallots();
+                this.$bus.$emit('message:push','deploy success!','success');
             })
         },
         customFormatter(date) {
@@ -304,14 +305,24 @@ export default {
             this.$http[httpMethod](api,{data:newballot}).then((response)=>{
                 console.log(response.data);
                 if(response.data.success){
+                    this.$bus.$emit('message:push','update successfully!','success');
                     $('#newballotModal').modal('hide');
                     vm.getBallots();
                 }else{
+                    this.$bus.$emit('message:push','update failed!','danger');
                     $('#newballotModal').modal('hide');
                     vm.getBallots();
                 }
             })
         },
+        collectVote(ballot){
+            let id = ballot.id;
+            const api = `${process.env.APIPATH}/ballots/collectvote/${id}`;
+            const vm = this;
+            vm.$http.get(api).then((response)=>{
+                
+            })
+        }
     },
     computed:{
         tempTime: function(){

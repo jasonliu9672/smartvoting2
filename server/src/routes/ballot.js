@@ -29,19 +29,20 @@ router.post('/vote/:id',(req,res)=>{
     var send_address = req.body.send_address;
     Ballot.findOne({id: ballot_id},function(err,ballot){
         Contract.options.address = ballot.contract_address
-        Contract.methods.vote(message,signed_message).send({from: send_address}, function(error, result){
+        Contract.methods.verify(message,signed_message).send({from: send_address}, function(error, result){
             console.log(result)
         });
     })
 
 }) 
-router.get('/collectvote/:id', (req,res)=>{
+router.get('/collectvote/:id',(req,res)=>{
     var ballot_id = req.params.id;
     Ballot.findOne({id: ballot_id},function(err,ballot){
         Contract.options.address = ballot.contract_address
-        web3.eth.getAccounts().then(async (accounts) =>{
-            const result = await Contract.methods.collectVotes().call({from: accounts[0]});
-            console.log(result)
+        web3.eth.getAccounts().then(accounts =>{
+            Contract.methods.collectVotes().call({from: accounts[0]}, function(error, result){
+                console.log('result',result)
+            });
         })
     })
 

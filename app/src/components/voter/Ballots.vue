@@ -128,7 +128,8 @@
                         <textarea disabled class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" v-model="tempVoteString"></textarea>
                     </div>
                     <div class="d-flex flex-row justify-content-around">
-                        <div v-if="voteState == 4" class="text-center" >
+                        <div v-if="voteState == 5"><span class="badge badge-success" ></span>Voted</div>
+                        <div v-else-if="voteState == 4" class="text-center" >
                             <div class="form-group">
                                 <label for="AddressSelect">Select Vote Address</label>
                                 <multiselect id="AddressSelect" v-model="selectAddress" :options="addressList" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Pick an address"></multiselect>
@@ -283,6 +284,8 @@ export default {
             vm.$http.post(api,{signed_message:signed_message,message:message,send_address:send_address}).then((response)=>{
                 if(response.data.success){
                      this.$bus.$emit('message:push','vote!','success');
+                     vm.voteState = 5;
+                     $('#VoteModal').modal('hide');
                 }
             })
             

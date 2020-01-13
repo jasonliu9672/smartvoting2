@@ -323,7 +323,7 @@ export default {
             const api = `${process.env.APIPATH}/ballots/collectvote/${id}`;
             const vm = this;
             vm.$http.get(api).then((response)=>{
-                
+                console.log(response.data)
             })
         }
     },

@@ -29,7 +29,9 @@ router.post('/vote/:id',(req,res)=>{
     var send_address = req.body.send_address;
     Ballot.findOne({id: ballot_id},function(err,ballot){
         Contract.options.address = ballot.contract_address
-        Contract.methods.verify(message,signed_message).send({from: send_address}, function(error, result){
+        Contract.methods.vote(message,signed_message).send({from: send_address}, function(error, result){
+            res.json({success:true,
+                message:"test"});
             console.log(result)
         });
     })

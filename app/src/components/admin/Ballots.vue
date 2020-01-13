@@ -324,6 +324,8 @@ export default {
             const vm = this;
             vm.$http.get(api).then((response)=>{
                 console.log(response.data)
+                let alert_string = 'winner:'+response.data.winner+' with vote'+response.data.count;
+                this.$bus.$emit('message:push',alert_string,'warning');
             })
         }
     },

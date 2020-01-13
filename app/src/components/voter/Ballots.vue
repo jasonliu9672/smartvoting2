@@ -59,7 +59,8 @@
                         {{ballot.description}}
                     </td>
                     <td class="align-middle text-center">
-                        <button class="btn btn-primary btn" @click="openVoteModal(ballot)">vote</button>
+                        <span v-if="voteState == 5" class="badge badge-danger">voted</span>
+                        <button v-else class="btn btn-primary btn" @click="openVoteModal(ballot)">vote</button>
                     </td>
                 </tr>
             </tbody>
@@ -128,8 +129,7 @@
                         <textarea disabled class="form-control rounded-0" id="exampleFormControlTextarea2" rows="3" v-model="tempVoteString"></textarea>
                     </div>
                     <div class="d-flex flex-row justify-content-around">
-                        <div v-if="voteState == 5"><span class="badge badge-success" ></span>Voted</div>
-                        <div v-else-if="voteState == 4" class="text-center" >
+                        <div v-if="voteState == 4" class="text-center" >
                             <div class="form-group">
                                 <label for="AddressSelect">Select Vote Address</label>
                                 <multiselect id="AddressSelect" v-model="selectAddress" :options="addressList" :searchable="false" :close-on-select="false" :show-labels="false" placeholder="Pick an address"></multiselect>

@@ -104,16 +104,20 @@ contract Voting {
         else return true;
     }
 
-    function collectVotes () public view returns (string memory winningCandidate) {
-        // require(now > endTime ); string memory winningCandidate
+    function collectVotes () public view returns (string memory, uint) {
+        //require(now > endTime ); string memory winningCandidate
         uint winningCount = 0;
+        uint winningID;
+        string memory winningCandidate;
         for (uint i = 0; i < candidates.length; i++) {
             if (candidates[i].count > winningCount) {
                 winningCount = candidates[i].count;
+                winningID = candidates[i].id;
                 winningCandidate = candidates[i].name;
             }
         }
-        // return winningCandidate;
-        // return candidates[0].name;
+        //return winningID;
+        return (winningCandidate, winningCount);
+        //return candidates[0].count;
     }
 }

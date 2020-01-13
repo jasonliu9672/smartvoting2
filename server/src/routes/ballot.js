@@ -29,10 +29,15 @@ router.post('/vote/:id',(req,res)=>{
     var send_address = req.body.send_address;
     Ballot.findOne({id: ballot_id},function(err,ballot){
         Contract.options.address = ballot.contract_address
+<<<<<<< HEAD
         Contract.methods.vote(message,signed_message).send({from: send_address}, function(error, result){
             res.json({success:true,
                 message:"test"});
             console.log(result)
+=======
+        Contract.methods.vote(message,signed_message).send({from: send_address,gas:3000000}, function(error, result){
+            console.log(result, error)
+>>>>>>> 120801ba4cb8075a1bfa286c55cb4342f235c2c9
         });
     })
 
@@ -43,7 +48,7 @@ router.get('/collectvote/:id',(req,res)=>{
         Contract.options.address = ballot.contract_address
         web3.eth.getAccounts().then(accounts =>{
             Contract.methods.collectVotes().call({from: accounts[0]}, function(error, result){
-                console.log('result',result)
+                console.log('result',result[0], result[1], error)
             });
         })
     })

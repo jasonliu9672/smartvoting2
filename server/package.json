@@ -27,7 +27,7 @@
     "mongoose-sequence": "^5.2.2",
     "solc": "^0.4.25",
     "truffle-contract": "^4.0.31",
-    "validator": "^11.1.0",
+    "validator": "^13.7.0",
     "web3": "^1.2.4"
   },
   "devDependencies": {
